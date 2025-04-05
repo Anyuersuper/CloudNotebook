@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown-It 加载测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        .info {
+            color: blue;
+        }
+        button {
+            padding: 8px 15px;
+            background: #4a6bfa;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #preview {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-top: 15px;
+            background: #f9f9f9;
+        }
+        pre {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Markdown-It 加载测试</h1>
+    
+    <div class="container">
+        <h2>测试状态</h2>
+        <p id="status">等待测试...</p>
+        <p><strong>当前页面URL:</strong> <span id="current-url"></span></p>
+        <p><strong>脚本路径:</strong> <span id="script-path"></span></p>
+        <p><strong>详细信息:</strong> <span id="detail-info"></span></p>
+        <div>
+            <button onclick="loadMarkdownIt()">加载Markdown-It</button>
+            <button onclick="testMarkdownIt()">测试渲染</button>
+            <button onclick="testAllPaths()">测试所有路径</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>Markdown 预览测试</h2>
+        <textarea id="markdown" rows="6" style="width: 100%; padding: 10px;" placeholder="输入Markdown内容进行测试">## 测试标题
+- 列表项1
+- 列表项2
+
+```js
+console.log('代码块测试');
+```
+
+**加粗文本** *斜体文本*</textarea>
+        <button onclick="renderMarkdown()">渲染预览</button>
+        <div id="preview"></div>
+    </div>
+    
+    <div class="container">
+        <h2>路径测试结果</h2>
+        <pre id="path-results">未进行测试</pre>
+    </div>
+    
+    <!-- 加载测试脚本 -->
+    <script>
+        // 显示当前页面信息
+        document.getElementById('current-url').textContent = window.location.href;
+        
+        // 尝试加载markdown-it
+        function loadMarkdownIt() {
+            updateStatus('尝试加载markdown-it...', 'info');
+            
+            // 移除所有现有的markdown-it脚本
+            var existingScripts = document.querySelectorAll('script[src*="markdown-it"]');
+            existingScripts.forEach(function(script) {
+                script.parentNode.removeChild(script);
+            });
+            
+            // 创建新的script元素
+            var script = document.createElement('script');
+            script.onload = function() {
+                updateStatus('markdown-it.min.js加载成功!', 'success');
+                document.getElementById('script-path').textContent = script.src;
+                
+                // 检查是否可用
+                if (typeof markdownit !== 'undefined') {
+                    try {
+                        window.md = markdownit();
+                        updateStatus('markdown-it实例创建成功!', 'success');
+                    } catch (e) {
+                        updateStatus('创建markdown-it实例失败: ' + e.message, 'error');
+                    }
+                } else {
+                    updateStatus('脚本加载成功但markdownit未定义', 'error');
+                }
+            };
+            script.onerror = function() {
+                updateStatus('加载markdown-it.min.js失败', 'error');
+                tryFallbackPath();
+            };
+            
+            // 尝试相对路径
+            script.src = 'markdown-it.min.js';
+            document.head.appendChild(script);
+        }
+        
+        // 尝试备用路径
+        function tryFallbackPath() {
+            updateStatus('尝试从CDN加载...', 'info');
+            var cdnScript = document.createElement('script');
+            cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.3.2/markdown-it.min.js';
+            cdnScript.onload = function() {
+                updateStatus('从CDN加载成功!', 'success');
+                document.getElementById('script-path').textContent = cdnScript.src;
+                
+                if (typeof markdownit !== 'undefined') {
+                    try {
+                        window.md = markdownit();
+                        updateStatus('从CDN创建markdown-it实例成功!', 'success');
+                    } catch (e) {
+                        updateStatus('创建markdown-it实例失败: ' + e.message, 'error');
+                    }
+                }
+            };
+            cdnScript.onerror = function() {
+                updateStatus('从CDN加载也失败，请检查网络', 'error');
+            };
+            document.head.appendChild(cdnScript);
+        }
+        
+        // 测试markdown-it
+        function testMarkdownIt() {
+            if (typeof markdownit === 'undefined') {
+                updateStatus('markdownit未定义，请先加载', 'error');
+                return;
+            }
+            
+            try {
+                if (!window.md) {
+                    window.md = markdownit();
+                }
+                
+                var testMd = '# 测试标题\n- 列表项1\n- 列表项2';
+                var result = window.md.render(testMd);
+                
+                document.getElementById('detail-info').innerHTML = '渲染结果:<br>' + result;
+                updateStatus('测试成功，渲染正常', 'success');
+            } catch (e) {
+                updateStatus('测试失败: ' + e.message, 'error');
+            }
+        }
+        
+        // 渲染markdown
+        function renderMarkdown() {
+            if (typeof markdownit === 'undefined') {
+                updateStatus('markdownit未定义，请先加载', 'error');
+                return;
+            }
+            
+            try {
+                if (!window.md) {
+                    window.md = markdownit();
+                }
+                
+                var markdown = document.getElementById('markdown').value;
+                var preview = document.getElementById('preview');
+                
+                preview.innerHTML = window.md.render(markdown);
+                updateStatus('渲染完成', 'success');
+            } catch (e) {
+                updateStatus('渲染失败: ' + e.message, 'error');
+            }
+        }
+        
+        // 测试所有可能的路径
+        function testAllPaths() {
+            var paths = [
+                'markdown-it.min.js',
+                '/js/markdown-it.min.js',
+                '../js/markdown-it.min.js',
+                './js/markdown-it.min.js',
+                '../markdown-it.min.js',
+                './markdown-it.min.js',
+                'js/markdown-it.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.3.2/markdown-it.min.js'
+            ];
+            
+            var results = [];
+            var pending = paths.length;
+            
+            paths.forEach(function(path, index) {
+                testPath(path, function(success, message) {
+                    results[index] = path + ': ' + (success ? '成功' : '失败') + ' - ' + message;
+                    pending--;
+                    
+                    if (pending === 0) {
+                        // 所有路径测试完成
+                        document.getElementById('path-results').textContent = results.join('\n');
+                    }
+                });
+            });
+        }
+        
+        // 测试单个路径
+        function testPath(path, callback) {
+            var script = document.createElement('script');
+            script.onload = function() {
+                callback(true, '加载成功');
+                script.parentNode.removeChild(script);
+            };
+            script.onerror = function() {
+                callback(false, '加载失败');
+                script.parentNode.removeChild(script);
+            };
+            script.src = path;
+            document.head.appendChild(script);
+        }
+        
+        // 更新状态
+        function updateStatus(message, type) {
+            var status = document.getElementById('status');
+            status.textContent = message;
+            status.className = type || '';
+        }
+    </script>
+</body>
+</html> 
