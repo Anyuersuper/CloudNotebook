@@ -2,8 +2,8 @@
 // 设置时区
 date_default_timezone_set('Asia/Shanghai');
 
-// 引入数据库工具
-require_once(__DIR__.'/db.php');
+// 引入核心文件
+require_once(__DIR__.'/core.php');
 
 // 设置管理员密码
 $admin_password = 'yuer9837';

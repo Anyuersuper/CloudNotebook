@@ -2,8 +2,8 @@
 // 设置时区
 date_default_timezone_set('Asia/Shanghai');
 
-// 引入数据库工具
-require_once('system/db.php');
+// 引入核心文件
+require_once('system/core.php');
 ?>
 <!DOCTYPE html>
 <html lang="zh">

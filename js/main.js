@@ -1,3 +1,9 @@
+/**
+ * 云笔记主要JavaScript功能
+ * 整合了编辑器、预览和界面交互功能
+ */
+
+// 在DOM加载完成后初始化应用
 document.addEventListener('DOMContentLoaded', function() {
     // 检查当前页面类型
     const isNotebookPage = document.querySelector('#editor') !== null || 
@@ -30,7 +36,109 @@ document.addEventListener('DOMContentLoaded', function() {
         // 初始化时也处理一次
         handleImageLayout();
     }
+
+    // 布局修复功能
+    applyLayoutFixes();
+    
+    // 监听窗口大小变化，重新应用布局修复
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            applyLayoutFixes();
+        }, 250);
+    });
 });
+
+/**
+ * 应用布局修复
+ */
+function applyLayoutFixes() {
+    // 增加容器宽度
+    const container = document.querySelector('.container');
+    if (container) {
+        container.style.maxWidth = '1500px';
+    }
+    
+    // 改进左侧导航
+    const leftSection = document.querySelector('.left-section');
+    if (leftSection) {
+        leftSection.style.width = '100%';
+        leftSection.style.justifyContent = 'space-between';
+    }
+    
+    const logo = document.querySelector('.logo');
+    if (logo) {
+        logo.style.width = '160px';
+        logo.style.flexShrink = '0';
+    }
+    
+    const notebookTitle = document.querySelector('.notebook-title');
+    if (notebookTitle) {
+        notebookTitle.style.flexGrow = '1';
+        notebookTitle.style.overflow = 'hidden';
+        notebookTitle.style.textOverflow = 'ellipsis';
+        notebookTitle.style.whiteSpace = 'nowrap';
+    }
+    
+    // 调整编辑器布局
+    const editorMain = document.querySelector('.editor-main');
+    if (editorMain && window.innerWidth > 768) {
+        editorMain.style.flexDirection = 'row';
+        editorMain.style.height = 'auto';
+        
+        // 设置编辑区与预览区样式
+        const editorInput = document.querySelector('.editor-input');
+        const editorPreview = document.querySelector('.editor-preview');
+        
+        if (editorInput && editorPreview) {
+            editorInput.style.height = 'auto';
+            editorInput.style.minHeight = '600px';
+            editorInput.style.flex = '1';
+            
+            editorPreview.style.height = 'auto';
+            editorPreview.style.minHeight = '600px';
+            editorPreview.style.flex = '1';
+        }
+    } else if (editorMain && window.innerWidth <= 768) {
+        // 移动设备上设置垂直布局
+        editorMain.style.height = '800px';
+        
+        const editorInput = document.querySelector('.editor-input');
+        const editorPreview = document.querySelector('.editor-preview');
+        
+        if (editorInput) {
+            editorInput.style.height = '400px';
+        }
+        
+        if (editorPreview) {
+            editorPreview.style.height = '400px';
+        }
+    }
+}
+
+/**
+ * 复制文本功能
+ */
+function copyText(elementId) {
+    const text = document.getElementById(elementId).textContent;
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    
+    // 显示复制成功提示
+    const button = event.target;
+    const originalText = button.textContent;
+    button.textContent = '已复制';
+    button.style.background = '#4a6bfa';
+    setTimeout(function() {
+        button.textContent = originalText;
+        button.style.background = '#333';
+    }, 2000);
+}
 
 // 调试函数，用于显示库的加载情况
 function debugLibraries() {
