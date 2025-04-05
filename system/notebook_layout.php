@@ -9,6 +9,20 @@
     <!-- 整合后的CSS样式表 -->
     <link rel="stylesheet" href="css/app.css">
     
+    <!-- 强制隐藏滚动条的内联样式 -->
+    <style>
+        /* 隐藏所有滚动条的关键样式 */
+        ::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        * {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+    </style>
+    
     <!-- Markdown和高亮库 -->
     <script src="./js/highlight.min.js"></script>
     <script src="./js/markdown-it.min.js"></script>
@@ -102,12 +116,20 @@
                     </div>
                 </div>
                 <div class="editor-main">
-                    <div class="editor-input">
-                        <textarea id="editor" spellcheck="false"><?php echo htmlspecialchars($content); ?></textarea>
-                    </div>
-                    <div class="editor-preview" id="preview">
-                        <!-- 预览内容将在此显示 -->
-                    </div>
+                    <table style="width:100%; height:100%; border-collapse:collapse; table-layout:fixed; background:#1c2033; border-radius:10px;">
+                        <tr>
+                            <td style="width:50%; padding:0; vertical-align:top; border-right:1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="height:100%; position:relative;">
+                                    <textarea id="editor" spellcheck="false" style="width:100%; height:100%; padding:20px; border:none; resize:none; background:transparent; color:#f0f2f5; font-family:'Consolas','Monaco','Menlo',monospace; font-size:16px; line-height:1.7; outline:none; display:block; overflow:auto; scrollbar-width:none;"><?php echo htmlspecialchars($content); ?></textarea>
+                                </div>
+                            </td>
+                            <td style="width:50%; padding:0; vertical-align:top; position:relative;">
+                                <div id="preview" style="padding:20px; position:absolute; top:0; right:0; bottom:0; left:0; overflow:auto; color:#f0f2f5; font-size:16px; line-height:1.7; scrollbar-width:none;">
+                                    <!-- 预览内容将在此显示 -->
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>

@@ -89,7 +89,7 @@ require_once('system/core.php');
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 80% !important;
             margin: 0 auto;
             padding: 30px 20px;
             position: relative;
@@ -331,10 +331,14 @@ require_once('system/core.php');
             .hero-title {
                 font-size: 2.8em;
             }
+            .container {
+                max-width: 80%;
+            }
         }
 
         @media (max-width: 768px) {
             .container {
+                max-width: 80%;
                 padding: 20px;
             }
             .header {

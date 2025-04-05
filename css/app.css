@@ -18,6 +18,8 @@ body {
     padding: 0;
     min-height: 100vh;
     overflow-x: hidden;
+    /* 恢复垂直滚动以避免在某些情况下的布局问题 */
+    overflow-y: auto;
 }
 
 /* 背景几何元素 */
@@ -64,10 +66,13 @@ body {
 }
 
 .container {
-    max-width: 1500px; /* 增加容器宽度，提供更多编辑空间 */
+    max-width: 80%; /* 限制容器宽度为屏幕的80% */
     margin: 0 auto;
     padding: 30px 20px;
     position: relative;
+    /* 移除固定高度和滚动设置 */
+    height: auto;
+    min-height: calc(100vh - 60px);
 }
 
 h1, h2, h3 {
@@ -229,12 +234,15 @@ a:hover {
 .editor-section {
     height: calc(100vh - 140px);
     min-height: 650px;
+    overflow: hidden;
+    border-radius: 10px;
 }
 
 .editor-container {
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .editor-header {
@@ -259,17 +267,28 @@ a:hover {
 }
 
 .editor-main {
-    display: flex;
-    flex: 1;
-    gap: 20px;
     height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
 }
 
-.editor-input, .editor-preview {
-    flex: 1;
-    border-radius: 10px;
-    background-color: #1c2033;
+.editor-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
     overflow: auto;
+}
+
+.editor-preview {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    overflow: auto;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #editor {
@@ -489,7 +508,27 @@ a:hover {
     width: 100%;
 }
 
-/* 滚动条样式 */
+/* 容器滚动条样式 */
+.container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 编辑器和预览区域滚动条样式 */
 .editor-preview::-webkit-scrollbar, #editor::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -507,6 +546,19 @@ a:hover {
 
 .editor-preview::-webkit-scrollbar-thumb:hover, #editor::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+/* 隐藏所有其他可能的滚动条 */
+.editor-main::-webkit-scrollbar,
+.editor-section::-webkit-scrollbar,
+.editor-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+body::-webkit-scrollbar {
+    width: 8px;
 }
 
 /* ====== 响应式布局 ====== */
@@ -533,8 +585,8 @@ a:hover {
     }
     
     .editor-section {
-        min-height: auto;
         height: auto;
+        min-height: auto;
     }
     
     .editor-container {
@@ -567,6 +619,30 @@ a:hover {
     
     .card {
         padding: 20px;
+    }
+    
+    .editor-main table {
+        display: block;
+    }
+    
+    .editor-main table tr {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .editor-main table td {
+        display: block;
+        width: 100% !important;
+        height: 400px !important;
+    }
+    
+    .editor-main table td:first-child {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    #editor, #preview {
+        height: 100% !important;
     }
 }
 
@@ -623,4 +699,23 @@ pre code.hljs {
 
 code.hljs {
     padding: 3px 5px;
+}
+
+/* 完全隐藏滚动条 */
+#editor::-webkit-scrollbar,
+#preview::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
+/* Firefox 滚动条隐藏 */
+#editor, #preview {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+/* 确保IE也隐藏滚动条 */
+#editor, #preview {
+    -ms-overflow-style: none !important;
 } 

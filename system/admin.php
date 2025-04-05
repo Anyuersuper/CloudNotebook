@@ -103,6 +103,21 @@ $total_pages = ceil($total_notebooks / $per_page);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>云笔记 - 管理系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 强制隐藏滚动条的内联样式 -->
+    <style>
+        /* 隐藏所有滚动条的关键样式 */
+        ::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        * {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+    </style>
+    
     <style>
         :root {
             --primary: #4a6bfa;
@@ -114,35 +129,27 @@ $total_pages = ceil($total_notebooks / $per_page);
             --gray: #6e7888;
             --success: #10b981;
             --danger: #ef4444;
-            --border-radius: 12px;
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --card-shadow-hover: 0 15px 50px rgba(0, 0, 0, 0.2);
-            --transition: all 0.3s ease;
+            --border-radius: 8px;
+            --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.2);
+            --transition: all 0.2s ease;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", "Microsoft YaHei", "Segoe UI", sans-serif;
             background-color: var(--dark);
             color: white;
-            line-height: 1.6;
-            position: relative;
-            min-height: 100vh;
-            overflow-x: hidden;
+            line-height: 1.5;
+            font-size: 0.95em;
         }
 
         /* 背景几何元素 */
         .background {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
             overflow: hidden;
         }
@@ -156,20 +163,16 @@ $total_pages = ceil($total_notebooks / $per_page);
 
         .shape-1 {
             background: var(--primary);
-            width: 600px;
-            height: 600px;
-            top: -300px;
-            right: -100px;
+            width: 600px; height: 600px;
+            top: -300px; right: -100px;
             border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
             animation: float 10s ease-in-out infinite alternate;
         }
 
         .shape-2 {
             background: var(--secondary);
-            width: 500px;
-            height: 500px;
-            bottom: -200px;
-            left: -100px;
+            width: 500px; height: 500px;
+            bottom: -200px; left: -100px;
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             animation: float 12s ease-in-out infinite alternate-reverse;
         }
@@ -180,7 +183,7 @@ $total_pages = ceil($total_notebooks / $per_page);
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 80% !important;
             margin: 0 auto;
             padding: 30px 20px;
             position: relative;
@@ -190,7 +193,8 @@ $total_pages = ceil($total_notebooks / $per_page);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
+            position: relative;
         }
 
         .logo {
@@ -210,8 +214,15 @@ $total_pages = ceil($total_notebooks / $per_page);
             color: transparent;
         }
 
-        .back-link {
+        .top-nav {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-link {
             color: var(--gray);
+            background: none;
+            box-shadow: none;
             text-decoration: none;
             font-weight: 600;
             font-size: 1.1em;
@@ -220,81 +231,67 @@ $total_pages = ceil($total_notebooks / $per_page);
             border-radius: 8px;
         }
 
-        .back-link:hover {
+        .nav-link:hover {
             color: white;
             background-color: rgba(255, 255, 255, 0.1);
+            transform: none;
+            box-shadow: none;
         }
 
         .admin-title {
-            font-size: 2.5em;
+            font-size: 1.8em;
             font-weight: 800;
-            margin-bottom: 30px;
             text-align: center;
             background: linear-gradient(90deg, white, #a5b4fc);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            white-space: nowrap; /* 防止标题在小屏幕上换行 */
         }
 
         .card {
             background-color: var(--darker);
             border-radius: var(--border-radius);
-            padding: 40px;
+            padding: 20px;
             box-shadow: var(--card-shadow);
             transition: var(--transition);
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
 
         .card:hover {
             box-shadow: var(--card-shadow-hover);
-            transform: translateY(-5px);
-        }
-
-        .card-title {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: white;
-            text-align: center;
+            transform: translateY(-2px);
         }
 
         .login-form {
-            max-width: 450px;
+            max-width: 400px;
             margin: 0 auto;
         }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
+        .form-group { margin-bottom: 15px; }
 
         .form-label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: var(--light);
-            font-size: 1.1em;
+            font-size: 1em;
         }
 
         .form-input {
             width: 100%;
-            padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
             background-color: rgba(255, 255, 255, 0.05);
             color: white;
-            font-size: 1em;
-            transition: var(--transition);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 107, 250, 0.3);
+            font-size: 0.95em;
         }
 
         .btn-container {
             display: flex;
             justify-content: space-between;
-            gap: 15px;
+            gap: 10px;
         }
 
         .btn {
@@ -302,76 +299,53 @@ $total_pages = ceil($total_notebooks / $per_page);
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 1em;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-size: 0.95em;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(74, 107, 250, 0.4);
             flex: 1;
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(74, 107, 250, 0.6);
-        }
-
-        .btn-home {
-            background: linear-gradient(90deg, var(--gray), #566074);
-            box-shadow: 0 4px 15px rgba(110, 120, 136, 0.4);
-        }
-
-        .btn-home:hover {
-            box-shadow: 0 6px 20px rgba(110, 120, 136, 0.6);
+            transform: translateY(-2px);
         }
 
         .btn-danger {
             background: linear-gradient(90deg, var(--danger), #db2a2a);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            padding: 8px 15px;
+            padding: 5px 10px;
             font-size: 0.9em;
         }
 
-        .btn-danger:hover {
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
-        }
-
         .message {
-            padding: 15px;
+            padding: 10px;
             border-radius: var(--border-radius);
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             background-color: rgba(239, 68, 68, 0.2);
-            border-left: 4px solid var(--danger);
-            animation: fadeIn 0.5s ease;
+            border-left: 3px solid var(--danger);
         }
 
         .message.success {
             background-color: rgba(16, 185, 129, 0.2);
-            border-left: 4px solid var(--success);
+            border-left: 3px solid var(--success);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .notebook-list {
-            width: 100%;
-        }
+        .notebook-list { width: 100%; }
 
         .notebook-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            margin-top: 20px;
-            overflow: hidden;
+            margin-top: 10px;
+            font-size: 0.9em;
+            min-height: 400px; /* 确保表格有固定的最小高度 */
         }
 
         .notebook-table th, .notebook-table td {
-            padding: 15px;
+            padding: 8px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -380,6 +354,7 @@ $total_pages = ceil($total_notebooks / $per_page);
             background-color: rgba(255, 255, 255, 0.05);
             font-weight: 600;
             color: var(--light);
+            font-size: 0.9em;
         }
 
         .notebook-table tr {
@@ -391,86 +366,68 @@ $total_pages = ceil($total_notebooks / $per_page);
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .notebook-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .record-info {
-            margin: 20px 0;
-            color: var(--gray);
-            font-size: 0.95em;
-            text-align: center;
-        }
-
         .pagination {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
-            list-style: none;
+            margin-top: 15px;
+            gap: 5px;
         }
 
         .pagination a, .pagination span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
             background-color: rgba(255, 255, 255, 0.05);
-            color: var(--gray);
-            border-radius: 8px;
+            color: var(--light);
             text-decoration: none;
             transition: var(--transition);
+            font-size: 0.9em;
         }
 
         .pagination a:hover {
             background-color: rgba(255, 255, 255, 0.1);
-            color: white;
         }
 
-        .pagination .active span {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        .pagination .current {
+            background-color: var(--primary);
             color: white;
         }
-
-        .pagination .disabled span {
+        
+        .pagination .disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 30px;
-            color: var(--gray);
-            font-style: italic;
-        }
-
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
-            }
-            .admin-title {
-                font-size: 2em;
-            }
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                margin-bottom: 40px;
-            }
-            .card {
-                padding: 25px;
-            }
-            .notebook-table th, .notebook-table td {
+                max-width: 100% !important;
                 padding: 10px;
             }
-            .pagination {
-                flex-wrap: wrap;
+            
+            .admin-title {
+                font-size: 1.5em;
+                padding: 8px 20px !important;
+            }
+            
+            .admin-header {
+                display: none;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .notebook-table {
+                font-size: 0.85em;
+            }
+            
+            .notebook-table th, .notebook-table td {
+                padding: 6px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -487,12 +444,28 @@ $total_pages = ceil($total_notebooks / $per_page);
                 <i class="fas fa-book"></i>
                 <span>云笔记</span>
             </a>
-            <a href="../index.php" class="back-link">
-                <i class="fas fa-arrow-left"></i> 返回首页
-            </a>
+            <div style="position: absolute; left: 50%; transform: translateX(-50%); font-size: 1.8em; font-weight: 800;">
+                <span style="background: linear-gradient(90deg, white, #a5b4fc); -webkit-background-clip: text; background-clip: text; color: transparent;">管理后台</span>
+            </div>
+            <div class="top-nav">
+                <?php if ($logged_in): ?>
+                <a href="../index.php" class="nav-link">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+                <a href="admin.php?logout=1" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                </a>
+                <?php else: ?>
+                <a href="../index.php" class="nav-link">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+                <?php endif; ?>
+            </div>
         </header>
 
-        <h1 class="admin-title">管理后台</h1>
+        <div class="admin-header" style="text-align: center; margin-bottom: 30px; display: none;">
+            <!-- 隐藏独立的标题区域 -->
+        </div>
 
         <?php if (!empty($message)): ?>
             <div class="message <?php echo strpos($message, '成功') !== false ? 'success' : ''; ?>">
@@ -511,7 +484,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                     </div>
                     <div class="btn-container">
                         <button type="submit" class="btn">登录</button>
-                        <a href="../index.php" class="btn btn-home">返回首页</a>
+                        <a href="../index.php" class="btn">返回首页</a>
                     </div>
                 </form>
             </div>
@@ -550,18 +523,31 @@ $total_pages = ceil($total_notebooks / $per_page);
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
+                            
+                            <?php 
+                            // 如果记录少于10条，添加空行保持高度
+                            $empty_rows = 10 - count($notebooks);
+                            for ($i = 0; $i < $empty_rows && $empty_rows > 0; $i++): ?>
+                                <tr style="height: 40px;">
+                                    <td>&nbsp;</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            <?php endfor; ?>
                         </tbody>
                     </table>
                     
                     <!-- 分页导航 -->
                     <?php if ($total_pages > 1): ?>
-                    <ul class="pagination">
+                    <div class="pagination">
                         <?php if ($page > 1): ?>
-                            <li><a href="?page=1">&laquo;</a></li>
-                            <li><a href="?page=<?php echo $page - 1; ?>">&lt;</a></li>
+                            <a href="?page=1">&laquo;</a>
+                            <a href="?page=<?php echo $page - 1; ?>">&lt;</a>
                         <?php else: ?>
-                            <li class="disabled"><span>&laquo;</span></li>
-                            <li class="disabled"><span>&lt;</span></li>
+                            <span class="disabled">&laquo;</span>
+                            <span class="disabled">&lt;</span>
                         <?php endif; ?>
                         
                         <?php
@@ -571,20 +557,20 @@ $total_pages = ceil($total_notebooks / $per_page);
                         
                         for ($i = $start_page; $i <= $end_page; $i++): ?>
                             <?php if ($i == $page): ?>
-                                <li class="active"><span><?php echo $i; ?></span></li>
+                                <span class="current"><?php echo $i; ?></span>
                             <?php else: ?>
-                                <li><a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                                <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                             <?php endif; ?>
                         <?php endfor; ?>
                         
                         <?php if ($page < $total_pages): ?>
-                            <li><a href="?page=<?php echo $page + 1; ?>">&gt;</a></li>
-                            <li><a href="?page=<?php echo $total_pages; ?>">&raquo;</a></li>
+                            <a href="?page=<?php echo $page + 1; ?>">&gt;</a>
+                            <a href="?page=<?php echo $total_pages; ?>">&raquo;</a>
                         <?php else: ?>
-                            <li class="disabled"><span>&gt;</span></li>
-                            <li class="disabled"><span>&raquo;</span></li>
+                            <span class="disabled">&gt;</span>
+                            <span class="disabled">&raquo;</span>
                         <?php endif; ?>
-                    </ul>
+                    </div>
                     <?php endif; ?>
                 <?php else: ?>
                     <div class="empty-message">
@@ -592,11 +578,6 @@ $total_pages = ceil($total_notebooks / $per_page);
                         <p>用户创建新记事本后将显示在此列表中</p>
                     </div>
                 <?php endif; ?>
-            </div>
-            
-            <div class="actions">
-                <a href="../index.php" class="btn btn-home">返回首页</a>
-                <a href="admin.php?logout=1" class="btn">退出登录</a>
             </div>
         <?php endif; ?>
     </div>
