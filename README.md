@@ -1,53 +1,107 @@
-# 在线记事本系统
+# 📝 云笔记 (Cloud Notebook)
 
-一个简单的在线记事本系统，支持Markdown格式，使用PHP、HTML、JavaScript和CSS开发。
+![PHP Version](https://img.shields.io/badge/PHP-5.6+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## 功能特点
+云笔记是一个简洁、安全、高效的在线Markdown笔记工具，支持实时预览、密码保护和管理功能。它专为需要随时记录和分享想法的用户设计，无需注册即可快速创建和访问笔记本。
 
-- 通过ID访问记事本
-- 密码保护，确保只有授权用户可以访问
-- 实时Markdown预览
-- 自动保存内容
-- 支持快捷键（Ctrl+S保存）
-- 响应式设计，适应不同设备
+## ✨ 主要功能
 
-## 如何使用
+- 🔒 **密码保护**：每个笔记本都有独立密码，确保内容安全
+- 📋 **Markdown支持**：支持完整的Markdown语法，包括标题、列表、代码块等
+- 🖥️ **实时预览**：编辑时实时显示渲染后的Markdown效果
+- 💾 **自动保存**：自动保存编辑内容，防止意外丢失
+- 🌈 **代码高亮**：支持多种编程语言的代码语法高亮
+- 📱 **响应式设计**：适配不同设备屏幕，包括手机和平板
+- 🔍 **管理功能**：提供管理界面查看和管理所有笔记本
 
-1. 访问主页面，输入记事本ID
-2. 如果是新记事本，设置密码
-3. 如果是已有记事本，输入密码
-4. 编辑记事本内容，支持Markdown格式
-5. 点击保存按钮或使用Ctrl+S快捷键保存
+## 🛠️ 技术栈
 
-## 安装说明
+- **前端**：
+  - HTML5, CSS3, JavaScript
+  - Markdown-it (Markdown解析)
+  - highlight.js (代码高亮)
+  - Font Awesome (图标)
+
+- **后端**：
+  - PHP (支持5.6+)
+  - SQLite (数据存储)
+  - 原生会话管理
+
+## 🚀 如何使用
+
+### 创建和访问笔记本
+
+1. 在主页输入笔记本ID
+2. 首次访问时设置密码，创建新笔记本
+3. 再次访问时输入密码进入笔记本
+4. 使用Markdown语法编辑内容，右侧实时预览
+
+### 管理入口使用
+
+1. 点击首页底部的"管理入口"链接
+2. 使用默认密码 `notebook` 登录 (强烈建议修改默认密码)
+3. 在管理界面可以查看和删除所有笔记本
+
+### 修改管理员密码
+
+1. 打开 `system/admin.php` 文件
+2. 找到第8行: `$admin_password = 'notebook';`
+3. 将 `notebook` 修改为您想要设置的新密码
+4. 保存文件
+
+## 📦 安装说明
 
 ### 环境要求
 
-- PHP 7.0+
-- Web服务器（Apache, Nginx等）
-- 支持JavaScript的现代浏览器
+- PHP 5.6 或更高版本
+- SQLite 支持
+- Web服务器 (Apache, Nginx等)
 
 ### 安装步骤
 
-1. 将所有文件上传到Web服务器
-2. 确保`data`目录有写入权限
-3. 访问`index.php`开始使用
+1. 下载或克隆项目代码
+2. 将所有文件上传到您的网站根目录或子目录
+3. 确保 `data` 目录可写 (权限设置为 755)
+4. 访问网站地址，例如 `http://yourdomain.com/` 或 `http://yourdomain.com/cloudnote/`
+5. 立即修改管理员默认密码 (见上文)
 
-## 注意事项
+## 📁 项目结构
 
-- 记事本内容存储在`data`目录下，每个记事本都是一个独立的`.md`文件
-- 密码哈希存储在每个文件的第一行
-- 系统不使用cookies保存任何信息，每次访问都需要输入密码
+```
+云笔记/
+├── css/                  # 样式文件
+│   └── app.css           # 主样式表
+├── data/                 # 数据存储 (自动创建)
+│   └── notebook.db       # SQLite数据库文件
+├── js/                   # JavaScript文件
+│   ├── highlight.min.js  # 代码高亮库
+│   ├── main.js           # 主要应用逻辑
+│   ├── markdown-bundle.js # Markdown处理集成
+│   └── markdown-it.min.js # Markdown解析库
+├── system/               # 后端系统文件
+│   ├── admin.php         # 管理界面
+│   ├── api.php           # API入口
+│   ├── core.php          # 核心功能
+│   └── notebook_layout.php # 笔记本界面
+├── index.php             # 网站主页
+└── notebook.php          # 笔记本入口
+```
 
-## 安全提示
+## 🔐 安全注意事项
 
-- 请使用复杂密码保护您的记事本
-- 不要共享敏感信息
-- 建议定期备份重要内容
+- 立即修改默认管理员密码
+- 定期备份 `data` 目录下的数据库文件
+- 在生产环境中，设置合适的文件权限
 
-## 技术实现
+## 📄 许可协议
 
-- 前端：HTML, CSS, JavaScript
-- 后端：PHP
-- Markdown解析：marked.js
-- 数据存储：文件系统 
+MIT License
+
+## 👨‍💻 关于作者
+
+云笔记项目由欲儿开发，旨在提供一款简单易用的在线笔记工具。
+
+---
+
+💡 **提示**: 如果您有任何问题或建议，欢迎提交Issue或Pull Request。 

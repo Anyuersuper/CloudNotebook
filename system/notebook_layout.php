@@ -79,22 +79,7 @@
         <div id="editor-section" class="editor-section">
             <div class="editor-container">
                 <div class="editor-header">
-                    <div class="editor-status">
-                        <div id="save-status" class="save-status"></div>
-                    </div>
                     <div class="editor-actions">
-                        <div class="zoom-controls">
-                            <button id="zoom-out" class="zoom-button" title="缩小">
-                                <i class="fas fa-search-minus"></i>
-                            </button>
-                            <div id="zoom-level" class="zoom-level">100%</div>
-                            <button id="zoom-in" class="zoom-button" title="放大">
-                                <i class="fas fa-search-plus"></i>
-                            </button>
-                            <button id="zoom-reset" class="zoom-button" title="重置缩放">
-                                <i class="fas fa-undo"></i>
-                            </button>
-                        </div>
                         <button id="save-button" class="btn">
                             <i class="fas fa-save"></i> 保存
                         </button>
@@ -113,6 +98,9 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="editor-status">
+                        <div id="save-status" class="save-status"></div>
                     </div>
                 </div>
                 <div class="editor-main">
@@ -212,16 +200,39 @@
             
             if (settingsButton && settingsMenu) {
                 // 点击设置按钮显示/隐藏设置菜单
-                settingsButton.addEventListener('click', function() {
+                settingsButton.addEventListener('click', function(e) {
+                    // 阻止事件冒泡，防止点击设置后立即关闭
+                    e.stopPropagation();
+                    
+                    // 计算设置菜单的位置，避免溢出
+                    const buttonRect = settingsButton.getBoundingClientRect();
+                    const windowWidth = window.innerWidth;
+                    const menuWidth = 280; // 菜单宽度
+                    
+                    // 如果按钮右侧空间不足，则向左展开菜单
+                    if (buttonRect.right + menuWidth > windowWidth) {
+                        settingsMenu.style.right = '0';
+                        settingsMenu.style.left = 'auto';
+                        
+                        // 调整三角形位置
+                        document.documentElement.style.setProperty('--triangle-left', 'auto');
+                        document.documentElement.style.setProperty('--triangle-right', '20px');
+                    } else {
+                        settingsMenu.style.left = '0';
+                        settingsMenu.style.right = 'auto';
+                        
+                        // 重置三角形位置
+                        document.documentElement.style.setProperty('--triangle-left', '20px');
+                        document.documentElement.style.setProperty('--triangle-right', 'auto');
+                    }
+                    
                     settingsMenu.classList.toggle('show');
                 });
                 
                 // 点击页面其他地方关闭设置菜单
-                window.addEventListener('click', function(event) {
+                document.addEventListener('click', function(event) {
                     if (!event.target.matches('.settings-btn') && !settingsMenu.contains(event.target)) {
-                        if (settingsMenu.classList.contains('show')) {
-                            settingsMenu.classList.remove('show');
-                        }
+                        settingsMenu.classList.remove('show');
                     }
                 });
                 
@@ -267,68 +278,6 @@
                             alert('保存设置时发生错误');
                             console.error(error);
                         });
-                    });
-                }
-            }
-            
-            // 预览区域缩放功能
-            if (isAuthenticated) {
-                const preview = document.getElementById('preview');
-                const zoomIn = document.getElementById('zoom-in');
-                const zoomOut = document.getElementById('zoom-out');
-                const zoomReset = document.getElementById('zoom-reset');
-                const zoomLevelDisplay = document.getElementById('zoom-level');
-                
-                if (preview && zoomIn && zoomOut && zoomReset && zoomLevelDisplay) {
-                    // 缩放设置
-                    const MIN_ZOOM = 50;
-                    const MAX_ZOOM = 200;
-                    const STEP = 10;
-                    let zoomLevel = 100;
-                    
-                    // 应用缩放
-                    function applyZoom() {
-                        preview.style.transform = `scale(${zoomLevel / 100})`;
-                        preview.style.transformOrigin = 'top left';
-                        zoomLevelDisplay.textContent = `${zoomLevel}%`;
-                        
-                        // 保存缩放级别到localStorage
-                        localStorage.setItem(`zoom_${noteId}`, zoomLevel);
-                        
-                        return zoomLevel;
-                    }
-                    
-                    // 载入保存的缩放级别
-                    try {
-                        const savedZoom = localStorage.getItem(`zoom_${noteId}`);
-                        if (savedZoom) {
-                            zoomLevel = parseInt(savedZoom);
-                            applyZoom();
-                        }
-                    } catch (e) {
-                        console.error('读取缩放级别时出错:', e);
-                    }
-                    
-                    // 放大
-                    zoomIn.addEventListener('click', function() {
-                        if (zoomLevel < MAX_ZOOM) {
-                            zoomLevel += STEP;
-                            applyZoom();
-                        }
-                    });
-                    
-                    // 缩小
-                    zoomOut.addEventListener('click', function() {
-                        if (zoomLevel > MIN_ZOOM) {
-                            zoomLevel -= STEP;
-                            applyZoom();
-                        }
-                    });
-                    
-                    // 重置
-                    zoomReset.addEventListener('click', function() {
-                        zoomLevel = 100;
-                        applyZoom();
                     });
                 }
             }
@@ -446,10 +395,12 @@
                         // 如果编辑器内容发生变化，更新状态
                         if (content !== lastSavedContent) {
                             saveStatus.textContent = '未保存的更改';
-                            saveStatus.style.color = 'var(--primary)';
+                            saveStatus.style.color = '#f39c12';
+                            saveStatus.style.backgroundColor = 'rgba(243, 156, 18, 0.1)';
                         } else {
                             saveStatus.textContent = '已保存';
-                            saveStatus.style.color = 'var(--success)';
+                            saveStatus.style.color = '#27ae60';
+                            saveStatus.style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
                         }
                     }
                 }
@@ -484,10 +435,14 @@
                     const content = editor.value;
                     if (content === lastSavedContent) {
                         saveStatus.textContent = '没有需要保存的更改';
+                        saveStatus.style.color = '#6e7888';
+                        saveStatus.style.backgroundColor = 'rgba(110, 120, 136, 0.1)';
                         return;
                     }
                     
                     saveStatus.textContent = '正在保存...';
+                    saveStatus.style.color = '#3498db';
+                    saveStatus.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
                     
                     const formData = new FormData();
                     formData.append('action', 'save_note');
@@ -504,14 +459,17 @@
                             lastSavedContent = content;
                             saveStatus.textContent = '保存成功 ' + new Date().toLocaleTimeString();
                             saveStatus.style.color = '#2ecc71';
+                            saveStatus.style.backgroundColor = 'rgba(46, 204, 113, 0.1)';
                         } else {
                             saveStatus.textContent = '保存失败: ' + (data.message || '未知错误');
                             saveStatus.style.color = '#e74c3c';
+                            saveStatus.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
                         }
                     })
                     .catch(error => {
                         saveStatus.textContent = '保存时发生错误';
                         saveStatus.style.color = '#e74c3c';
+                        saveStatus.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
                         console.error('保存错误:', error);
                     });
                 }

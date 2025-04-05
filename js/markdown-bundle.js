@@ -23,10 +23,8 @@ function initMarkdown() {
             breaks: true,
             linkify: true
         });
-        console.log('Markdown解析器已初始化');
         window.mdResolve(window.md);
     } else {
-        console.warn('Markdown解析器加载失败，使用回退解决方案');
         // 提供一个简单的回退解析器
         window.md = {
             render: function(text) {
@@ -65,11 +63,10 @@ function loadMarkdownIt() {
     const script = document.createElement('script');
     script.src = './js/markdown-it.min.js';
     script.onload = function() {
-        console.log('成功动态加载markdown-it，正在初始化...');
         initMarkdown();
     };
     script.onerror = function() {
-        console.error('无法加载markdown-it，使用备用渲染器');
+        // 使用备用渲染器
     };
     document.head.appendChild(script);
 }

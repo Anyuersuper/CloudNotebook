@@ -6,7 +6,7 @@ date_default_timezone_set('Asia/Shanghai');
 require_once(__DIR__.'/core.php');
 
 // 设置管理员密码
-$admin_password = 'yuer9837';
+$admin_password = 'notebook';
 
 // 只有在会话尚未启动时才启动会话
 if (session_status() == PHP_SESSION_NONE) {
@@ -188,6 +188,13 @@ $total_pages = ceil($total_notebooks / $per_page);
             padding: 30px 20px;
             position: relative;
         }
+        
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 150px);
+        }
 
         .header {
             display: flex;
@@ -265,10 +272,23 @@ $total_pages = ceil($total_notebooks / $per_page);
 
         .login-form {
             max-width: 400px;
-            margin: 0 auto;
+            width: 100%;
+            padding: 35px 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .form-group { margin-bottom: 15px; }
+        .card-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 700;
+            color: white;
+        }
+
+        .form-group { 
+            margin-bottom: 25px; 
+        }
 
         .form-label {
             display: block;
@@ -280,18 +300,26 @@ $total_pages = ceil($total_notebooks / $per_page);
 
         .form-input {
             width: 100%;
-            padding: 10px;
+            padding: 12px 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--border-radius);
             background-color: rgba(255, 255, 255, 0.05);
             color: white;
-            font-size: 0.95em;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 107, 250, 0.3);
+            outline: none;
         }
 
         .btn-container {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
+            gap: 15px;
+            margin-top: 30px;
         }
 
         .btn {
@@ -299,9 +327,9 @@ $total_pages = ceil($total_notebooks / $per_page);
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 14px 20px;
             border-radius: var(--border-radius);
-            font-size: 0.95em;
+            font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -404,6 +432,10 @@ $total_pages = ceil($total_notebooks / $per_page);
                 padding: 10px;
             }
             
+            .login-container {
+                min-height: calc(100vh - 120px);
+            }
+            
             .admin-title {
                 font-size: 1.5em;
                 padding: 8px 20px !important;
@@ -417,17 +449,35 @@ $total_pages = ceil($total_notebooks / $per_page);
                 padding: 15px;
             }
             
+            .login-form {
+                width: 90%;
+                max-width: 350px;
+                padding: 25px 20px;
+            }
+            
+            .card-title {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .btn-container {
+                margin-top: 25px;
+            }
+            
+            .btn {
+                padding: 12px 16px;
+            }
+            
             .notebook-table {
                 font-size: 0.85em;
             }
             
             .notebook-table th, .notebook-table td {
                 padding: 6px;
-            }
-            
-            .btn {
-                padding: 6px 12px;
-                font-size: 0.9em;
             }
         }
     </style>
@@ -467,28 +517,37 @@ $total_pages = ceil($total_notebooks / $per_page);
             <!-- 隐藏独立的标题区域 -->
         </div>
 
-        <?php if (!empty($message)): ?>
+        <?php if (!$logged_in): ?>
+            <div class="login-container">
+                <!-- 登录表单 -->
+                <div class="card login-form">
+                    <h2 class="card-title">管理员登录</h2>
+                    
+                    <?php if (!empty($message)): ?>
+                    <div class="message <?php echo strpos($message, '成功') !== false ? 'success' : ''; ?>" style="margin-bottom: 15px;">
+                        <?php echo $message; ?>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <form method="post" action="admin.php">
+                        <div class="form-group">
+                            <label for="password" class="form-label">管理密码：</label>
+                            <input type="password" id="password" name="password" class="form-input" required autofocus>
+                        </div>
+                        <div class="btn-container">
+                            <button type="submit" class="btn">登录</button>
+                            <a href="../index.php" class="btn">返回首页</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <?php else: ?>
+            <?php if (!empty($message)): ?>
             <div class="message <?php echo strpos($message, '成功') !== false ? 'success' : ''; ?>">
                 <?php echo $message; ?>
             </div>
-        <?php endif; ?>
-
-        <?php if (!$logged_in): ?>
-            <!-- 登录表单 -->
-            <div class="card login-form">
-                <h2 class="card-title">管理员登录</h2>
-                <form method="post" action="admin.php">
-                    <div class="form-group">
-                        <label for="password" class="form-label">管理密码：</label>
-                        <input type="password" id="password" name="password" class="form-input" required>
-                    </div>
-                    <div class="btn-container">
-                        <button type="submit" class="btn">登录</button>
-                        <a href="../index.php" class="btn">返回首页</a>
-                    </div>
-                </form>
-            </div>
-        <?php else: ?>
+            <?php endif; ?>
+            
             <!-- 已登录状态 - 显示记事本列表 -->
             <div class="card notebook-list">
                 <h2 class="card-title">记事本列表</h2>

@@ -4,6 +4,11 @@
  */
 
 /* ====== 基础样式 ====== */
+:root {
+    --triangle-left: 20px;
+    --triangle-right: auto;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -258,6 +263,17 @@ a:hover {
 .editor-status {
     font-size: 14px;
     color: #6e7888;
+    text-align: right;
+    min-width: 180px;
+}
+
+.save-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    border: none;
 }
 
 .editor-actions {
@@ -418,37 +434,6 @@ a:hover {
     margin: 0 auto;
 }
 
-/* 缩放控制样式 */
-.zoom-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 5px 10px;
-    border-radius: 8px;
-}
-
-.zoom-button {
-    background: none;
-    border: none;
-    color: #f0f2f5;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.zoom-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.zoom-level {
-    font-size: 14px;
-    color: #f0f2f5;
-    min-width: 40px;
-    text-align: center;
-}
-
 /* 设置菜单样式 */
 .settings-dropdown {
     position: relative;
@@ -463,15 +448,33 @@ a:hover {
 .settings-content {
     display: none;
     position: absolute;
-    right: 0;
     top: 100%;
-    background-color: #151824;
-    min-width: 250px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background-color: #1a1e2e; /* 更深的背景色 */
+    min-width: 240px;
+    max-width: 280px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     padding: 15px;
     z-index: 1000;
-    margin-top: 10px;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    left: 0; /* 默认左对齐 */
+}
+
+/* 设置三角形指示器位置 */
+.settings-content::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: var(--triangle-left);
+    right: var(--triangle-right);
+    width: 16px;
+    height: 16px;
+    background: #1a1e2e;
+    transform: rotate(45deg);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: -1;
 }
 
 .settings-content.show {
@@ -480,32 +483,43 @@ a:hover {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
+    from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* 设置内容项样式 */
 .settings-item {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+.settings-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .settings-item label {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     cursor: pointer;
+    font-weight: 500;
 }
 
 .settings-description {
     font-size: 13px;
-    color: #6e7888;
-    margin-bottom: 10px;
+    color: #a0aec0; /* 更亮的描述文字颜色 */
+    margin-bottom: 12px;
+    line-height: 1.4;
 }
 
 .mini-btn {
     padding: 8px 15px;
     font-size: 14px;
     width: 100%;
+    background: linear-gradient(90deg, #4a6bfa, #6c63ff);
 }
 
 /* 容器滚动条样式 */
@@ -608,13 +622,12 @@ body::-webkit-scrollbar {
         align-items: flex-start;
     }
     
-    .editor-actions {
+    .editor-actions, .editor-status {
         width: 100%;
-        justify-content: space-between;
     }
     
-    .zoom-controls {
-        display: none;
+    .editor-status {
+        text-align: left;
     }
     
     .card {
@@ -643,6 +656,15 @@ body::-webkit-scrollbar {
     
     #editor, #preview {
         height: 100% !important;
+    }
+    
+    /* 移动设备上的设置菜单样式 */
+    .settings-content {
+        position: absolute;
+        max-width: 90vw;
+        width: 280px;
+        right: auto;
+        left: 0;
     }
 }
 
