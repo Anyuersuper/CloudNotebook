@@ -494,16 +494,13 @@ $total_pages = ceil($total_notebooks / $per_page);
                 <i class="fas fa-book"></i>
                 <span>云笔记</span>
             </a>
-            <div style="position: absolute; left: 50%; transform: translateX(-50%); font-size: 1.8em; font-weight: 800;">
-                <span style="background: linear-gradient(90deg, white, #a5b4fc); -webkit-background-clip: text; background-clip: text; color: transparent;">管理后台</span>
-            </div>
             <div class="top-nav">
                 <?php if ($logged_in): ?>
                 <a href="../index.php" class="nav-link">
-                    <i class="fas fa-home"></i> 返回首页
+                    <i class="fas fa-home"></i>首页
                 </a>
                 <a href="admin.php?logout=1" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                    <i class="fas fa-sign-out-alt"></i>注销
                 </a>
                 <?php else: ?>
                 <a href="../index.php" class="nav-link">
@@ -550,7 +547,7 @@ $total_pages = ceil($total_notebooks / $per_page);
             
             <!-- 已登录状态 - 显示记事本列表 -->
             <div class="card notebook-list">
-                <h2 class="card-title">记事本列表</h2>
+                <h2 class="card-title">后台管理</h2>
                 
                 <?php if (count($notebooks) > 0): ?>
                     <div class="record-info">
