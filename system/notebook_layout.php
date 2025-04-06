@@ -83,11 +83,11 @@
                         <button id="save-button" class="btn">
                             <i class="fas fa-save"></i> 保存
                         </button>
-                        <div class="settings-dropdown">
+                        <div class="settings-dropdown" >
                             <button id="settings-button" class="btn settings-btn">
                                 <i class="fas fa-cog"></i> 设置
                             </button>
-                            <div id="settings-menu" class="settings-content">
+                            <div id="settings-menu" class="settings-content" >
                                 <div class="settings-item">
                                     <label>
                                         <input type="checkbox" id="always-require-password" <?php echo $db->getAlwaysRequirePassword($id) ? 'checked' : ''; ?>>
@@ -207,7 +207,7 @@
                     // 计算设置菜单的位置，避免溢出
                     const buttonRect = settingsButton.getBoundingClientRect();
                     const windowWidth = window.innerWidth;
-                    const menuWidth = 280; // 菜单宽度
+                    const menuWidth = 180; // 菜单宽度
                     
                     // 如果按钮右侧空间不足，则向左展开菜单
                     if (buttonRect.right + menuWidth > windowWidth) {
