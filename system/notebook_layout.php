@@ -290,6 +290,67 @@
         .settings-item:last-child {
             margin-bottom: 20px;
         }
+
+        /* 开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+            box-shadow: 0 0 15px rgba(74, 107, 250, 0.5);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .settings-item label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .settings-item .label-text {
+            font-weight: 500;
+            color: var(--light);
+        }
     </style>
     
     <!-- Markdown和高亮库 -->
@@ -359,25 +420,28 @@
                             <div id="settings-menu" class="settings-content">
                                 <div class="settings-item">
                                     <label>
-                                        <input type="checkbox" id="always-require-password" <?php echo $db->getAlwaysRequirePassword($id) ? 'checked' : ''; ?>>
-                                        总是要求密码
+                                        <span class="switch">
+                                            <input type="checkbox" id="always-require-password" <?php echo $db->getAlwaysRequirePassword($id) ? 'checked' : ''; ?>>
+                                            <span class="slider"></span>
+                                        </span>
+                                        <span class="label-text">总是要求密码</span>
                                     </label>
                                     <div class="settings-description">启用此选项后，每次访问笔记本都需要输入密码</div>
                                 </div>
                                 <div class="settings-divider"></div>
                                 <div class="settings-item">
                                     <label>
-                                        <input type="checkbox" id="public-toggle" <?php echo $db->isPublic($id) ? 'checked' : ''; ?>>
-                                        公开笔记本
+                                        <span class="switch">
+                                            <input type="checkbox" id="public-toggle" <?php echo $db->isPublic($id) ? 'checked' : ''; ?>>
+                                            <span class="slider"></span>
+                                        </span>
+                                        <span class="label-text">公开笔记本</span>
                                     </label>
                                     <div class="settings-description">启用后，其他人可以通过链接查看笔记本内容（无需密码）</div>
                                 </div>
                                 <button id="save-settings" class="btn mini-btn">保存设置</button>
                             </div>
                         </div>
-                        <button id="logout-button" class="btn">
-                            <i class="fas fa-sign-out-alt"></i> 退出
-                        </button>
                     </div>
                     <div class="editor-status">
                         <div id="save-status" class="save-status"></div>
