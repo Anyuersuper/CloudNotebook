@@ -740,37 +740,30 @@
                     if (e.key === 'Tab') {
                         e.preventDefault();
                         
-                        // 获取当前光标位置
+                        // 获取当前光标位置和文本内容
                         const start = editor.selectionStart;
                         const end = editor.selectionEnd;
-                        
-                        // 获取当前行的起始位置
                         const value = editor.value;
-                        let lineStart = value.lastIndexOf('\n', start - 1) + 1;
-                        if (lineStart < 0) lineStart = 0;
-                        
-                        // 获取当前行的内容
-                        const lineEnd = value.indexOf('\n', start);
-                        const line = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
                         
                         // 计算缩进
                         const indent = '    '; // 使用4个空格作为缩进
                         
-                        // 如果选中了多行，对每一行进行缩进
+                        // 如果选中了文本，对选中部分进行缩进
                         if (start !== end) {
-                            const lines = value.substring(start, end).split('\n');
+                            const selectedText = value.substring(start, end);
+                            const lines = selectedText.split('\n');
                             const newLines = lines.map(line => indent + line);
                             const newText = newLines.join('\n');
                             
                             // 替换选中的文本
                             editor.value = value.substring(0, start) + newText + value.substring(end);
                             
-                            // 更新光标位置
+                            // 更新选择范围
                             editor.selectionStart = start;
                             editor.selectionEnd = start + newText.length;
                         } else {
-                            // 单行缩进
-                            editor.value = value.substring(0, lineStart) + indent + value.substring(lineStart);
+                            // 在光标位置插入缩进
+                            editor.value = value.substring(0, start) + indent + value.substring(end);
                             
                             // 更新光标位置
                             editor.selectionStart = start + indent.length;
@@ -885,4 +878,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
