@@ -21,6 +21,275 @@
             scrollbar-width: none !important;
             -ms-overflow-style: none !important;
         }
+
+        /* 工具栏样式 */
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--darker);
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+        }
+
+        .toolbar-left, .toolbar-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .toolbar-button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .toolbar-button i {
+            font-size: 1em;
+        }
+
+        #save-button {
+            background: var(--primary);
+            color: white;
+        }
+
+        #save-button:hover {
+            background: var(--primary-dark);
+        }
+
+        #public-toggle {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #public-toggle.active {
+            background: var(--success);
+        }
+
+        #logout-button {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        #logout-button:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        /* 现代化按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(74, 107, 250, 0.9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(74, 107, 250, 0.3);
+            margin-right: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(74, 107, 250, 0.5);
+        }
+
+        .btn i {
+            font-size: 1em;
+        }
+
+        #save-button {
+            background: rgba(74, 107, 250, 0.9);
+        }
+
+        #public-toggle {
+            background: rgba(55, 65, 81, 0.9);
+            box-shadow: 0 0 20px rgba(55, 65, 81, 0.3);
+        }
+
+        #public-toggle.active {
+            background: rgba(16, 185, 129, 0.9);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        #public-toggle:hover {
+            box-shadow: 0 0 25px rgba(55, 65, 81, 0.5);
+        }
+
+        #public-toggle.active:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .editor-actions {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .editor-status {
+            margin-left: 15px;
+        }
+
+        /* 设置按钮样式 */
+        #settings-button {
+            background: rgba(55, 65, 81, 0.9);
+            box-shadow: 0 0 20px rgba(55, 65, 81, 0.3);
+        }
+
+        #settings-button:hover {
+            box-shadow: 0 0 25px rgba(55, 65, 81, 0.5);
+        }
+
+        /* 退出按钮样式 */
+        #logout-button {
+            background: rgba(55, 65, 81, 0.9);
+            box-shadow: 0 0 20px rgba(55, 65, 81, 0.3);
+        }
+
+        #logout-button:hover {
+            background: rgba(239, 68, 68, 0.9);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+        }
+
+        /* 设置下拉菜单样式 */
+        .settings-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .settings-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(28, 32, 51, 0.95);
+            min-width: 200px;
+            border-radius: 12px;
+            padding: 15px;
+            z-index: 1000;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+            margin-top: 10px;
+        }
+
+        .settings-content::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: var(--triangle-left, 20px);
+            right: var(--triangle-right, auto);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid rgba(28, 32, 51, 0.95);
+        }
+
+        .settings-content.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-item {
+            color: var(--light);
+            font-size: 0.9em;
+        }
+
+        .settings-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .settings-description {
+            color: var(--gray);
+            font-size: 0.85em;
+            margin: 5px 0 15px 0;
+        }
+
+        .settings-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 2px solid var(--gray);
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+            background: transparent;
+        }
+
+        .settings-item input[type="checkbox"]:checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .settings-item input[type="checkbox"]:checked::before {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .mini-btn {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .save-success {
+            color: var(--success);
+            font-size: 0.85em;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .settings-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 15px 0;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+        }
+
+        .settings-item:last-child {
+            margin-bottom: 20px;
+        }
     </style>
     
     <!-- Markdown和高亮库 -->
@@ -83,21 +352,32 @@
                         <button id="save-button" class="btn">
                             <i class="fas fa-save"></i> 保存
                         </button>
-                        <div class="settings-dropdown" >
+                        <div class="settings-dropdown">
                             <button id="settings-button" class="btn settings-btn">
                                 <i class="fas fa-cog"></i> 设置
                             </button>
-                            <div id="settings-menu" class="settings-content" >
+                            <div id="settings-menu" class="settings-content">
                                 <div class="settings-item">
                                     <label>
                                         <input type="checkbox" id="always-require-password" <?php echo $db->getAlwaysRequirePassword($id) ? 'checked' : ''; ?>>
                                         总是要求密码
                                     </label>
                                     <div class="settings-description">启用此选项后，每次访问笔记本都需要输入密码</div>
-                                    <button id="save-settings" class="btn mini-btn">保存设置</button>
                                 </div>
+                                <div class="settings-divider"></div>
+                                <div class="settings-item">
+                                    <label>
+                                        <input type="checkbox" id="public-toggle" <?php echo $db->isPublic($id) ? 'checked' : ''; ?>>
+                                        公开笔记本
+                                    </label>
+                                    <div class="settings-description">启用后，其他人可以通过链接查看笔记本内容（无需密码）</div>
+                                </div>
+                                <button id="save-settings" class="btn mini-btn">保存设置</button>
                             </div>
                         </div>
+                        <button id="logout-button" class="btn">
+                            <i class="fas fa-sign-out-alt"></i> 退出
+                        </button>
                     </div>
                     <div class="editor-status">
                         <div id="save-status" class="save-status"></div>
@@ -197,6 +477,7 @@
             const settingsMenu = document.getElementById('settings-menu');
             const saveSettingsButton = document.getElementById('save-settings');
             const alwaysRequirePasswordCheckbox = document.getElementById('always-require-password');
+            const publicToggleCheckbox = document.getElementById('public-toggle');
             
             if (settingsButton && settingsMenu) {
                 // 点击设置按钮显示/隐藏设置菜单
@@ -236,23 +517,34 @@
                     }
                 });
                 
-                // 保存设置
-                if (saveSettingsButton && alwaysRequirePasswordCheckbox) {
+                // 修改设置保存处理
+                if (saveSettingsButton) {
                     saveSettingsButton.addEventListener('click', function() {
                         const alwaysRequirePassword = alwaysRequirePasswordCheckbox.checked;
+                        const isPublic = publicToggleCheckbox.checked;
                         
-                        const formData = new FormData();
-                        formData.append('action', 'update_settings');
-                        formData.append('id', noteId);
-                        formData.append('always_require_password', alwaysRequirePassword ? '1' : '0');
-                        
-                        fetch('./system/api.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
+                        // 保存所有设置
+                        Promise.all([
+                            // 保存密码设置
+                            fetch('./system/api.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'action=update_settings&id=' + noteId + '&always_require_password=' + (alwaysRequirePassword ? '1' : '0')
+                            }),
+                            // 保存公开设置
+                            fetch('./system/api.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'action=update_public&id=' + noteId + '&ispublic=' + (isPublic ? '1' : '0')
+                            })
+                        ])
+                        .then(responses => Promise.all(responses.map(r => r.json())))
+                        .then(results => {
+                            if (results.every(r => r.success)) {
                                 const saveStatus = document.createElement('div');
                                 saveStatus.textContent = '设置已保存';
                                 saveStatus.style.color = 'var(--success)';
@@ -271,7 +563,7 @@
                                     settingsMenu.classList.remove('show');
                                 }, 1500);
                             } else {
-                                alert('保存设置失败: ' + (data.message || '未知错误'));
+                                alert('保存设置失败: ' + (results.find(r => !r.success)?.message || '未知错误'));
                             }
                         })
                         .catch(error => {

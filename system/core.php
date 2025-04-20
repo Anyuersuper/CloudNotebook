@@ -380,6 +380,12 @@ class NotebookAPI {
                 case 'update_settings':
                     $this->updateSettings($id);
                     break;
+                case 'update_public':
+                    $this->updatePublicStatus($id);
+                    break;
+                case 'get_public_status':
+                    $this->getPublicStatus($id);
+                    break;
                 default:
                     echo json_encode(['success' => false, 'message' => '无效的操作']);
                     break;
@@ -539,6 +545,52 @@ class NotebookAPI {
         } else {
             echo json_encode(['success' => false, 'message' => '更新设置失败']);
         }
+    }
+    
+    /**
+     * 更新笔记本公开状态
+     */
+    private function updatePublicStatus($id) {
+        // 检查认证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '未授权的操作']);
+            exit;
+        }
+        
+        if (!$this->db->notebookExists($id)) {
+            echo json_encode(['success' => false, 'message' => '记事本不存在']);
+            exit;
+        }
+        
+        $isPublic = isset($_POST['ispublic']) ? (bool)$_POST['ispublic'] : false;
+        
+        // 更新公开状态
+        $result = $this->db->setPublic($id, $isPublic);
+        
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => '更新公开状态失败']);
+        }
+    }
+    
+    /**
+     * 获取笔记本公开状态
+     */
+    private function getPublicStatus($id) {
+        // 检查认证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '未授权的操作']);
+            exit;
+        }
+        
+        if (!$this->db->notebookExists($id)) {
+            echo json_encode(['success' => false, 'message' => '记事本不存在']);
+            exit;
+        }
+        
+        $isPublic = $this->db->isPublic($id);
+        echo json_encode(['success' => true, 'isPublic' => $isPublic]);
     }
 }
 
