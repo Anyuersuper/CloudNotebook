@@ -77,7 +77,7 @@
 1. 下载或克隆项目代码
 2. 将所有文件上传到您的网站根目录或子目录
 3. 确保 `data` 目录可写 (权限设置为 755)
-4. 访问网站地址，例如 `http://yourdomain.com/` 或 `http://yourdomain.com/cloudnote/`
+4. 访问网站地址，例如 `http://yourdomain.com/`
 5. 立即修改管理员默认密码 (见上文)
 
 ## 📁 项目结构
