@@ -48,7 +48,7 @@
 
 2. **公开笔记**：
    - 可以通过链接直接访问，无需密码
-   - 访问地址：`https://你的域名/notebook.php?id=笔记ID`
+   - 访问地址：`http://yourdomain.com/notebook.php?id=笔记ID`
    - 在笔记本右上角设置中可以将笔记切换为公开/私密
 
 ### 管理入口使用
