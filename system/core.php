@@ -143,7 +143,8 @@ class NotebookDB {
                 content TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                always_require_password BOOLEAN DEFAULT 0
+                always_require_password BOOLEAN DEFAULT 0,
+                ispublic BOOLEAN DEFAULT 0
             )
         ');
     }
@@ -303,6 +304,32 @@ class NotebookDB {
         $stmt = $this->db->prepare('DELETE FROM notebooks WHERE id = :id');
         $stmt->bindParam(':id', $id, PDO::PARAM_STR);
         return $stmt->execute();
+    }
+    
+    /**
+     * 设置笔记本是否公开
+     */
+    public function setPublic($id, $isPublic) {
+        $stmt = $this->db->prepare('
+            UPDATE notebooks 
+            SET ispublic = :ispublic 
+            WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $isPublic = (int) $isPublic;
+        $stmt->bindParam(':ispublic', $isPublic, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
+    /**
+     * 检查笔记本是否公开
+     */
+    public function isPublic($id) {
+        $stmt = $this->db->prepare('SELECT ispublic FROM notebooks WHERE id = :id');
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? (bool)$result['ispublic'] : false;
     }
 }
 

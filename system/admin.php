@@ -75,6 +75,34 @@ if ($logged_in && isset($_POST['delete_id'])) {
     exit;
 }
 
+// 处理设置公开状态请求
+if ($logged_in && isset($_POST['set_public'])) {
+    $id = preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['id']);
+    $isPublic = isset($_POST['ispublic']) ? 1 : 0;
+    
+    if (!empty($id)) {
+        try {
+            $db = NotebookDB::getInstance();
+            
+            if ($db->notebookExists($id)) {
+                if ($db->setPublic($id, $isPublic)) {
+                    $message = "记事本 {$id} 的公开状态已更新！";
+                } else {
+                    $message = "更新记事本 {$id} 的公开状态失败！";
+                }
+            } else {
+                $message = "记事本 {$id} 不存在！";
+            }
+        } catch (Exception $e) {
+            $message = "发生错误: " . $e->getMessage();
+        }
+    }
+    
+    // 确保页面正确重定向，避免表单重复提交
+    header("Location: admin.php" . (isset($_GET['page']) ? "?page=" . (int)$_GET['page'] : ""));
+    exit;
+}
+
 // 分页设置
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $per_page = 10; // 每页10条记录
@@ -225,7 +253,7 @@ $total_pages = ceil($total_notebooks / $per_page);
             display: flex;
             gap: 20px;
         }
-        
+
         .nav-link {
             color: var(--gray);
             background: none;
@@ -480,6 +508,62 @@ $total_pages = ceil($total_notebooks / $per_page);
                 padding: 6px;
             }
         }
+
+        /* 添加开关按钮样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -561,6 +645,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                                 <th>创建时间</th>
                                 <th>更新时间</th>
                                 <th>总是需要密码</th>
+                                <th>公开状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -571,6 +656,16 @@ $total_pages = ceil($total_notebooks / $per_page);
                                     <td><?php echo htmlspecialchars($notebook['created_at']); ?></td>
                                     <td><?php echo htmlspecialchars($notebook['updated_at']); ?></td>
                                     <td><?php echo $notebook['always_require_password'] ? '是' : '否'; ?></td>
+                                    <td>
+                                        <form method="post" style="display: inline;" onsubmit="return confirm('确定要' + (this.ispublic.checked ? '公开' : '取消公开') + '笔记本 <?php echo htmlspecialchars($notebook['id']); ?> 吗？');">
+                                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($notebook['id']); ?>">
+                                            <input type="hidden" name="set_public" value="1">
+                                            <label class="switch">
+                                                <input type="checkbox" name="ispublic" <?php echo $db->isPublic($notebook['id']) ? 'checked' : ''; ?> onclick="if(confirm('确定要' + (this.checked ? '公开' : '取消公开') + '笔记本 <?php echo htmlspecialchars($notebook['id']); ?> 吗？')) { this.form.submit(); } else { return false; }">
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </form>
+                                    </td>
                                     <td>
                                         <form method="post" action="admin.php<?php echo isset($_GET['page']) ? '?page=' . (int)$_GET['page'] : ''; ?>" style="display:inline;" onsubmit="return confirm('确定要删除记事本 <?php echo htmlspecialchars($notebook['id']); ?> 吗？\n此操作不可恢复！');">
                                             <input type="hidden" name="delete_id" value="<?php echo htmlspecialchars($notebook['id']); ?>">
@@ -586,6 +681,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                             for ($i = 0; $i < $empty_rows && $empty_rows > 0; $i++): ?>
                                 <tr style="height: 40px;">
                                     <td>&nbsp;</td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
