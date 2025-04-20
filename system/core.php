@@ -162,16 +162,36 @@ class NotebookDB {
     /**
      * 创建新笔记本
      */
-    public function createNotebook($id, $password_hash) {
-        $content = "# " . $id . " 记事本\n\n开始记录你的想法...";
-        $stmt = $this->db->prepare('
-            INSERT INTO notebooks (id, password_hash, content) 
-            VALUES (:id, :password_hash, :content)
-        ');
-        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
-        $stmt->bindParam(':password_hash', $password_hash, PDO::PARAM_STR);
-        $stmt->bindParam(':content', $content, PDO::PARAM_STR);
-        return $stmt->execute();
+    public function createNotebook($id, $password) {
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $default_content = <<<EOT
+# 欢迎使用云笔记
+
+这是一个简单、安全的在线笔记工具。
+
+## 基本功能
+- 左侧编辑，右侧实时预览
+- 所有内容会自动保存
+- 可以随时通过密码访问你的笔记
+- 支持将笔记设置为公开或私密
+
+## 如何使用
+1. 编辑内容：直接在左侧编辑区输入内容
+2. 保存：内容会自动保存，无需手动操作
+3. 访问笔记：
+   - 私密笔记：通过密码访问
+   - 公开笔记：直接通过链接访问，无需密码
+4. 设置公开/私密：
+   - 点击右上角的设置按钮
+   - 选择"设为公开"或"设为私密"
+   - 公开笔记的访问地址：https://你的域名/notebook.php?id=笔记ID
+
+开始记录你的想法吧！
+EOT;
+        $stmt = $this->db->prepare("INSERT INTO notebooks (id, password_hash, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)");
+        $now = date('Y-m-d H:i:s');
+        $stmt->execute([$id, $password_hash, $default_content, $now, $now]);
+        return true;
     }
     
     /**

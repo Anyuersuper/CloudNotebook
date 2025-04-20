@@ -25,16 +25,19 @@ $db = NotebookDB::getInstance();
 
 // 检查笔记本是否存在
 $is_new = !$db->notebookExists($id);
-$content = '';
-
-// 如果不是新记事本，获取内容
-if (!$is_new) {
-    $content = $db->getNotebookContent($id);
-}
 
 // 检查认证状态
 $handler = new NotebookHandler();
 $is_authenticated = $handler->checkAuth($id);
+
+// 如果是新记事本，强制要求设置密码
+if ($is_new) {
+    $is_authenticated = false;
+    $content = '';
+} else {
+    // 如果不是新记事本，获取内容
+    $content = $db->getNotebookContent($id);
+}
 
 // 渲染笔记本页面
 require_once('system/notebook_layout.php');
