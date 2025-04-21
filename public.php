@@ -107,12 +107,14 @@ $content = $db->getNotebookContent($id);
             width: auto;
             flex-shrink: 0;
         }
-
         .logo span {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+        }
+        .logo i {
+            color: white;
         }
 
         .back-link {
