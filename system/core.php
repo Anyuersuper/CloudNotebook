@@ -8,8 +8,8 @@
 date_default_timezone_set('Asia/Shanghai');
 
 // 设置会话超时时间（单位：秒）
-ini_set('session.gc_maxlifetime', 300); // 5分钟后会话过期
-session_set_cookie_params(300); // 设置cookie生命周期为5分钟
+ini_set('session.gc_maxlifetime', 86400); // 1天后会话过期
+session_set_cookie_params(86400); // 设置cookie生命周期为1天分钟
 
 // 只有在会话尚未启动时才启动会话
 if (session_status() == PHP_SESSION_NONE) {
@@ -163,7 +163,7 @@ class NotebookDB {
      * 创建新笔记本
      */
     public function createNotebook($id, $password) {
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        // 直接使用传入的密码哈希，不再进行哈希处理
         $default_content = <<<EOT
 # 欢迎使用云笔记
 
@@ -190,7 +190,7 @@ class NotebookDB {
 EOT;
         $stmt = $this->db->prepare("INSERT INTO notebooks (id, password_hash, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)");
         $now = date('Y-m-d H:i:s');
-        $stmt->execute([$id, $password_hash, $default_content, $now, $now]);
+        $stmt->execute([$id, $password, $default_content, $now, $now]);
         return true;
     }
     
@@ -483,10 +483,10 @@ class NotebookAPI {
             exit;
         }
         
-        // 创建密码哈希
+        // 创建密码哈希 - 只在这里进行一次哈希处理
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         
-        // 创建笔记本
+        // 创建笔记本 - 传递哈希后的密码
         $result = $this->db->createNotebook($id, $password_hash);
         
         if ($result) {
