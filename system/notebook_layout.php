@@ -163,6 +163,22 @@
             box-shadow: 0 0 25px rgba(55, 65, 81, 0.5);
         }
 
+        /* 复制公开链接按钮样式 */
+        #copy-public-link {
+            width: 100%;
+            margin-bottom: 10px;
+            background: rgba(55, 65, 81, 0.9);
+        }
+
+        #copy-public-link:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #copy-public-link:not(:disabled):hover {
+            background: rgba(74, 107, 250, 0.9);
+        }
+
         /* 退出按钮样式 */
         #logout-button {
             background: rgba(55, 65, 81, 0.9);
@@ -439,6 +455,13 @@
                                     </label>
                                     <div class="settings-description">启用后，其他人可以通过链接查看笔记本内容（无需密码）</div>
                                 </div>
+                                <div class="settings-divider"></div>
+                                <div class="settings-item">
+                                    <button id="copy-public-link" class="btn mini-btn" <?php echo !$db->isPublic($id) ? 'disabled' : ''; ?>>
+                                        <i class="fas fa-link"></i> 复制公开链接
+                                    </button>
+                                    <div class="settings-description">复制可分享的公开访问链接</div>
+                                </div>
                                 <button id="save-settings" class="btn mini-btn">保存设置</button>
                             </div>
                         </div>
@@ -582,6 +605,29 @@
                 });
                 
                 // 修改设置保存处理
+                // 处理公开链接复制按钮
+                const copyPublicLinkButton = document.getElementById('copy-public-link');
+                if (copyPublicLinkButton) {
+                    // 当公开状态改变时更新按钮状态
+                    publicToggleCheckbox.addEventListener('change', function() {
+                        copyPublicLinkButton.disabled = !this.checked;
+                    });
+
+                    copyPublicLinkButton.addEventListener('click', function() {
+                        const publicUrl = window.location.origin + '/public.php?id=' + noteId;
+                        navigator.clipboard.writeText(publicUrl).then(() => {
+                            const originalText = this.innerHTML;
+                            this.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                            setTimeout(() => {
+                                this.innerHTML = originalText;
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy:', err);
+                            alert('复制链接失败，请手动复制');
+                        });
+                    });
+                }
+
                 if (saveSettingsButton) {
                     saveSettingsButton.addEventListener('click', function() {
                         const alwaysRequirePassword = alwaysRequirePasswordCheckbox.checked;
