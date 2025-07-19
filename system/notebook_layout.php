@@ -733,7 +733,7 @@
                         .then(data => {
                             if (data.success) {
                                 // 成功处理
-                                let redirectUrl = `notebook.php?id=${encodeURIComponent(noteId)}&t=${Date.now()}`;
+                                let redirectUrl = `notebook.php?id=${encodeURIComponent(noteId)}`;
                                 
                                 // 如果设置了总是需要密码，且验证成功，添加verified参数
                                 if (!isNew && data.always_require_password) {
