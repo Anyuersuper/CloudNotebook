@@ -144,9 +144,28 @@ class NotebookDB {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 always_require_password BOOLEAN DEFAULT 0,
-                ispublic BOOLEAN DEFAULT 0
+                ispublic BOOLEAN DEFAULT 0,
+                archive_code TEXT
             )
         ');
+        
+        // 检查是否需要添加 archive_code 列
+        try {
+            $columns = $this->db->query("PRAGMA table_info(notebooks)")->fetchAll(PDO::FETCH_ASSOC);
+            $hasArchiveCode = false;
+            foreach ($columns as $column) {
+                if ($column['name'] === 'archive_code') {
+                    $hasArchiveCode = true;
+                    break;
+                }
+            }
+            
+            if (!$hasArchiveCode) {
+                $this->db->exec('ALTER TABLE notebooks ADD COLUMN archive_code TEXT');
+            }
+        } catch (PDOException $e) {
+            // 忽略错误，表示列已存在
+        }
     }
     
     /**
@@ -351,6 +370,50 @@ EOT;
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? (bool)$result['ispublic'] : false;
     }
+
+    /**
+     * 设置笔记本归档码
+     */
+    public function setArchiveCode($id, $archiveCode) {
+        $stmt = $this->db->prepare('
+            UPDATE notebooks 
+            SET archive_code = :archive_code 
+            WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $stmt->bindParam(':archive_code', $archiveCode, PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    /**
+     * 获取笔记本归档码
+     */
+    public function getArchiveCode($id) {
+        $stmt = $this->db->prepare('SELECT archive_code FROM notebooks WHERE id = :id');
+        $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['archive_code'] : null;
+    }
+
+    /**
+     * 根据归档码获取笔记本列表
+     */
+    public function getNotebooksByArchiveCode($archiveCode) {
+        try {
+            $stmt = $this->db->prepare('
+                SELECT id, created_at, updated_at, always_require_password, ispublic 
+                FROM notebooks 
+                WHERE archive_code = :archive_code
+                ORDER BY created_at DESC
+            ');
+            $stmt->bindParam(':archive_code', $archiveCode, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
 }
 
 /**
@@ -405,6 +468,15 @@ class NotebookAPI {
                     break;
                 case 'get_public_status':
                     $this->getPublicStatus($id);
+                    break;
+                case 'set_archive_code':
+                    $this->setArchiveCode($id);
+                    break;
+                case 'get_archive_code':
+                    $this->getArchiveCode($id);
+                    break;
+                case 'get_notebooks_by_archive_code':
+                    $this->getNotebooksByArchiveCode($id);
                     break;
                 default:
                     echo json_encode(['success' => false, 'message' => '无效的操作']);
@@ -611,6 +683,77 @@ class NotebookAPI {
         
         $isPublic = $this->db->isPublic($id);
         echo json_encode(['success' => true, 'isPublic' => $isPublic]);
+    }
+    
+    /**
+     * 设置归档码
+     */
+    private function setArchiveCode($id) {
+        // 检查认证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '未授权的操作']);
+            exit;
+        }
+        
+        $archiveCode = isset($_POST['archive_code']) ? trim($_POST['archive_code']) : '';
+        
+        if (empty($archiveCode)) {
+            echo json_encode(['success' => false, 'message' => '归档码不能为空']);
+            exit;
+        }
+        
+        if (!$this->db->notebookExists($id)) {
+            echo json_encode(['success' => false, 'message' => '记事本不存在']);
+            exit;
+        }
+        
+        $result = $this->db->setArchiveCode($id, $archiveCode);
+        
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => '设置归档码失败']);
+        }
+    }
+    
+    /**
+     * 获取归档码
+     */
+    private function getArchiveCode($id) {
+        // 检查认证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '未授权的操作']);
+            exit;
+        }
+        
+        if (!$this->db->notebookExists($id)) {
+            echo json_encode(['success' => false, 'message' => '记事本不存在']);
+            exit;
+        }
+        
+        $archiveCode = $this->db->getArchiveCode($id);
+        echo json_encode(['success' => true, 'archiveCode' => $archiveCode]);
+    }
+    
+    /**
+     * 根据归档码获取笔记本列表
+     */
+    private function getNotebooksByArchiveCode($id) {
+        // 检查认证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '未授权的操作']);
+            exit;
+        }
+        
+        $archiveCode = isset($_POST['archive_code']) ? trim($_POST['archive_code']) : '';
+        
+        if (empty($archiveCode)) {
+            echo json_encode(['success' => false, 'message' => '归档码不能为空']);
+            exit;
+        }
+        
+        $notebooks = $this->db->getNotebooksByArchiveCode($archiveCode);
+        echo json_encode(['success' => true, 'notebooks' => $notebooks]);
     }
 }
 

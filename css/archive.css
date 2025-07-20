@@ -1,0 +1,241 @@
+/* 归档码查询页面样式 */
+.archive-search {
+    background: rgba(21, 24, 36, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.archive-search__header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.archive-search__title {
+    color: var(--light);
+    font-size: 2em;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.archive-search__title i {
+    color: #4a6bfa;
+}
+
+.archive-search__desc {
+    color: #6e7888;
+    font-size: 1.1em;
+}
+
+.archive-search__form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.archive-search__input-group {
+    display: flex;
+    gap: 15px;
+}
+
+.archive-search__input-wrap {
+    position: relative;
+    flex: 1;
+}
+
+.archive-search__icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4a6bfa;
+    font-size: 1.1em;
+}
+
+.archive-search__input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #f0f2f5;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.archive-search__input:focus {
+    outline: none;
+    border-color: #4a6bfa;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.archive-search__btn {
+    background: #4a6bfa;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.archive-search__btn:hover {
+    background: #3a56d4;
+    transform: translateY(-2px);
+}
+
+/* 搜索结果样式 */
+.archive-result {
+    background: rgba(21, 24, 36, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.archive-result:hover {
+    transform: translateY(-2px);
+    border-color: #4a6bfa;
+}
+
+.archive-result__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.archive-result__content {
+    flex: 1;
+}
+
+.archive-result__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.archive-result__id {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.archive-result__id i {
+    color: #4a6bfa;
+}
+
+.archive-result__status {
+    background: rgba(74, 107, 250, 0.1);
+    color: #4a6bfa;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.archive-result__meta {
+    display: flex;
+    gap: 20px;
+    color: #6e7888;
+    font-size: 0.9em;
+}
+
+.archive-result__date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.archive-result__date i {
+    color: #4a6bfa;
+    opacity: 0.8;
+}
+
+.archive-result__action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(74, 107, 250, 0.1);
+    color: #4a6bfa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.archive-result:hover .archive-result__action {
+    background: #4a6bfa;
+    color: white;
+}
+
+/* 无结果状态 */
+.archive-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: #6e7888;
+}
+
+.archive-empty i {
+    font-size: 3em;
+    margin-bottom: 20px;
+    display: block;
+    opacity: 0.5;
+}
+
+.archive-empty__text {
+    font-size: 1.1em;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .archive-search {
+        padding: 25px;
+    }
+    
+    .archive-search__input-group {
+        flex-direction: column;
+    }
+    
+    .archive-search__btn {
+        width: 100%;
+    }
+
+    .archive-result__link {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .archive-result__header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .archive-result__meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .archive-result__action {
+        justify-content: center;
+    }
+}

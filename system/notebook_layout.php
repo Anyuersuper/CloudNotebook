@@ -179,6 +179,32 @@
             background: rgba(74, 107, 250, 0.9);
         }
 
+        /* 归档码输入框样式 */
+        .settings-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        .settings-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .settings-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         /* 退出按钮样式 */
         #logout-button {
             background: rgba(55, 65, 81, 0.9);
@@ -300,11 +326,21 @@
         }
 
         .settings-item {
-            margin-bottom: 15px;
+            margin-bottom: 10px;  /* 减小底部间距 */
+            padding: 5px 0;      /* 减小内边距 */
         }
 
         .settings-item:last-child {
-            margin-bottom: 20px;
+            margin-bottom: 10px;  /* 减小最后一项的底部间距 */
+        }
+
+        .settings-description {
+            margin: 3px 0 8px 0;  /* 减小描述文字的上下间距 */
+            line-height: 1.3;     /* 减小描述文字的行高 */
+        }
+
+        .settings-divider {
+            margin: 8px 0;       /* 减小分隔线的上下间距 */
         }
 
         /* 开关样式 */
@@ -461,6 +497,12 @@
                                         <i class="fas fa-link"></i> 复制公开链接
                                     </button>
                                     <div class="settings-description">复制可分享的公开访问链接</div>
+                                </div>
+                                <div class="settings-divider"></div>
+                                <div class="settings-item">
+                                    <label for="archive-code" class="settings-label">归档码</label>
+                                    <input type="text" id="archive-code" class="settings-input" placeholder="设置归档码以便于管理" value="<?php echo htmlspecialchars($db->getArchiveCode($id)); ?>">
+                                    <div class="settings-description">设置归档码后，可以通过它查找属于同一类别的笔记本</div>
                                 </div>
                                 <button id="save-settings" class="btn mini-btn">保存设置</button>
                             </div>
@@ -632,6 +674,7 @@
                     saveSettingsButton.addEventListener('click', function() {
                         const alwaysRequirePassword = alwaysRequirePasswordCheckbox.checked;
                         const isPublic = publicToggleCheckbox.checked;
+                        const archiveCode = document.getElementById('archive-code').value.trim();
                         
                         // 保存所有设置
                         Promise.all([
@@ -650,6 +693,14 @@
                                     'Content-Type': 'application/x-www-form-urlencoded',
                                 },
                                 body: 'action=update_public&id=' + noteId + '&ispublic=' + (isPublic ? '1' : '0')
+                            }),
+                            // 保存归档码设置
+                            fetch('./system/api.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'action=set_archive_code&id=' + noteId + '&archive_code=' + encodeURIComponent(archiveCode)
                             })
                         ])
                         .then(responses => Promise.all(responses.map(r => r.json())))

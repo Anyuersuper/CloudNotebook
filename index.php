@@ -226,20 +226,19 @@ require_once('system/core.php');
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            padding: 15px 25px;
-            border-radius: 10px;
+            padding: 14px 20px;
+            border-radius: var(--border-radius);
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(74, 107, 250, 0.4);
+            flex: 1;
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(74, 107, 250, 0.6);
+            transform: translateY(-2px);
         }
 
         .btn-full {
@@ -368,6 +367,7 @@ require_once('system/core.php');
                 <span>云笔记</span>
             </a>
             <nav class="top-nav">
+                <a href="archive.php" class="nav-link">归档码</a>
                 <a href="#features" class="nav-link">功能特点</a>
                 <a href="system/admin.php" class="nav-link">管理入口</a>
             </nav>

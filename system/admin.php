@@ -646,6 +646,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                                 <th>更新时间</th>
                                 <th>总是需要密码</th>
                                 <th>公开状态</th>
+                                <th>归档码</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -666,6 +667,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                                             </label>
                                         </form>
                                     </td>
+                                    <td><?php echo htmlspecialchars($db->getArchiveCode($notebook['id'])) ?: '未设置'; ?></td>
                                     <td>
                                         <form method="post" action="admin.php<?php echo isset($_GET['page']) ? '?page=' . (int)$_GET['page'] : ''; ?>" style="display:inline;" onsubmit="return confirm('确定要删除记事本 <?php echo htmlspecialchars($notebook['id']); ?> 吗？\n此操作不可恢复！');">
                                             <input type="hidden" name="delete_id" value="<?php echo htmlspecialchars($notebook['id']); ?>">
@@ -681,6 +683,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                             for ($i = 0; $i < $empty_rows && $empty_rows > 0; $i++): ?>
                                 <tr style="height: 40px;">
                                     <td>&nbsp;</td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
