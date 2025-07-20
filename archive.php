@@ -10,6 +10,11 @@ $notebooks = [];
 $message = '';
 $has_searched = false;
 
+// 分页设置
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$per_page = 10; // 每页显示10条记录
+$total_notebooks = 0;
+
 // 处理归档码查询
 if (isset($_GET['archive_code']) && !empty($_GET['archive_code'])) {
     $archive_code = trim($_GET['archive_code']);
@@ -17,11 +22,18 @@ if (isset($_GET['archive_code']) && !empty($_GET['archive_code'])) {
     
     try {
         $db = NotebookDB::getInstance();
-        $notebooks = $db->getNotebooksByArchiveCode($archive_code);
+        // 计算偏移量
+        $offset = ($page - 1) * $per_page;
+        // 获取总记录数和分页数据
+        $total_notebooks = $db->countNotebooksByArchiveCode($archive_code);
+        $notebooks = $db->getNotebooksByArchiveCode($archive_code, $offset, $per_page);
     } catch (Exception $e) {
         $message = "查询失败: " . $e->getMessage();
     }
 }
+
+// 计算总页数
+$total_pages = ceil($total_notebooks / $per_page);
 ?>
 <!DOCTYPE html>
 <html lang="zh">
@@ -351,6 +363,53 @@ if (isset($_GET['archive_code']) && !empty($_GET['archive_code'])) {
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 5px;
+        }
+
+        .pagination a, .pagination span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 35px;
+            height: 35px;
+            padding: 0 10px;
+            border-radius: var(--border-radius);
+            background-color: var(--darker);
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination a:hover {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination .current {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .record-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
         @media (max-width: 640px) {
             .archive-form {
                 flex-direction: column;
@@ -358,6 +417,16 @@ if (isset($_GET['archive_code']) && !empty($_GET['archive_code'])) {
             
             .archive-button {
                 width: 100%;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
+
+            .pagination a, .pagination span {
+                min-width: 30px;
+                height: 30px;
+                font-size: 0.85em;
             }
         }
     </style>
@@ -432,6 +501,47 @@ if (isset($_GET['archive_code']) && !empty($_GET['archive_code'])) {
                         </div>
                     </a>
                 <?php endforeach; ?>
+
+                <!-- 分页导航 -->
+                <?php if ($total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php if ($page > 1): ?>
+                            <a href="?archive_code=<?php echo urlencode($_GET['archive_code']); ?>&page=1">&laquo;</a>
+                            <a href="?archive_code=<?php echo urlencode($_GET['archive_code']); ?>&page=<?php echo $page - 1; ?>">&lt;</a>
+                        <?php else: ?>
+                            <span class="disabled">&laquo;</span>
+                            <span class="disabled">&lt;</span>
+                        <?php endif; ?>
+                        
+                        <?php
+                        // 显示页码
+                        $start_page = max(1, $page - 2);
+                        $end_page = min($total_pages, $page + 2);
+                        
+                        for ($i = $start_page; $i <= $end_page; $i++): ?>
+                            <?php if ($i == $page): ?>
+                                <span class="current"><?php echo $i; ?></span>
+                            <?php else: ?>
+                                <a href="?archive_code=<?php echo urlencode($_GET['archive_code']); ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $total_pages): ?>
+                            <a href="?archive_code=<?php echo urlencode($_GET['archive_code']); ?>&page=<?php echo $page + 1; ?>">&gt;</a>
+                            <a href="?archive_code=<?php echo urlencode($_GET['archive_code']); ?>&page=<?php echo $total_pages; ?>">&raquo;</a>
+                        <?php else: ?>
+                            <span class="disabled">&gt;</span>
+                            <span class="disabled">&raquo;</span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <!-- 记录信息 -->
+                    <div class="record-info" style="text-align: center; margin-top: 15px; color: var(--gray);">
+                        显示 <?php echo $total_notebooks; ?> 条记录中的 
+                        <?php echo ($offset + 1); ?> 到 
+                        <?php echo min($offset + $per_page, $total_notebooks); ?> 条
+                    </div>
+                <?php endif; ?>
             <?php else: ?>
                 <div class="empty-message">
                     未找到使用该归档码的笔记本

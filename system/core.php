@@ -397,17 +397,38 @@ EOT;
     }
 
     /**
-     * 根据归档码获取笔记本列表
+     * 统计指定归档码的笔记本数量
      */
-    public function getNotebooksByArchiveCode($archiveCode) {
+    public function countNotebooksByArchiveCode($archiveCode) {
+        try {
+            $stmt = $this->db->prepare('
+                SELECT COUNT(*) 
+                FROM notebooks 
+                WHERE archive_code = :archive_code
+            ');
+            $stmt->bindParam(':archive_code', $archiveCode, PDO::PARAM_STR);
+            $stmt->execute();
+            return (int)$stmt->fetchColumn();
+        } catch (PDOException $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 根据归档码获取笔记本列表（带分页）
+     */
+    public function getNotebooksByArchiveCode($archiveCode, $offset = 0, $limit = 10) {
         try {
             $stmt = $this->db->prepare('
                 SELECT id, created_at, updated_at, always_require_password, ispublic 
                 FROM notebooks 
                 WHERE archive_code = :archive_code
                 ORDER BY created_at DESC
+                LIMIT :limit OFFSET :offset
             ');
             $stmt->bindParam(':archive_code', $archiveCode, PDO::PARAM_STR);
+            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
