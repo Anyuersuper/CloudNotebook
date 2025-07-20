@@ -501,7 +501,7 @@
                                 <div class="settings-divider"></div>
                                 <div class="settings-item">
                                     <label for="archive-code" class="settings-label">归档码</label>
-                                    <input type="text" id="archive-code" class="settings-input" placeholder="设置归档码以便于管理" value="<?php echo htmlspecialchars($db->getArchiveCode($id)); ?>">
+                                    <input type="text" id="archive-code" class="settings-input" placeholder="设置归档码以便于管理" value="<?php echo htmlspecialchars((string)$db->getArchiveCode($id)); ?>">
                                     <div class="settings-description">设置归档码后，可以通过它查找属于同一类别的笔记本</div>
                                 </div>
                                 <button id="save-settings" class="btn mini-btn">保存设置</button>
