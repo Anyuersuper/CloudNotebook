@@ -75,6 +75,34 @@ if ($logged_in && isset($_POST['delete_id'])) {
     exit;
 }
 
+// 处理归档码更新请求
+if ($logged_in && isset($_POST['set_archive_code'])) {
+    $id = preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['id']);
+    $archiveCode = trim($_POST['archive_code']);
+    
+    if (!empty($id)) {
+        try {
+            $db = NotebookDB::getInstance();
+            
+            if ($db->notebookExists($id)) {
+                if ($db->setArchiveCode($id, $archiveCode)) {
+                    $message = $archiveCode ? "记事本 {$id} 的归档码已更新！" : "记事本 {$id} 的归档码已清除！";
+                } else {
+                    $message = "更新记事本 {$id} 的归档码失败！";
+                }
+            } else {
+                $message = "记事本 {$id} 不存在！";
+            }
+        } catch (Exception $e) {
+            $message = "发生错误: " . $e->getMessage();
+        }
+    }
+    
+    // 确保页面正确重定向，避免表单重复提交
+    header("Location: admin.php" . (isset($_GET['page']) ? "?page=" . (int)$_GET['page'] : ""));
+    exit;
+}
+
 // 处理设置公开状态请求
 if ($logged_in && isset($_POST['set_public'])) {
     $id = preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['id']);
@@ -564,9 +592,97 @@ $total_pages = ceil($total_notebooks / $per_page);
         .slider.round:before {
             border-radius: 50%;
         }
+
+        /* 归档码编辑模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: var(--darker);
+            margin: 15% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .modal-title {
+            margin-bottom: 20px;
+            color: var(--light);
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 1.2em;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--light);
+        }
+
+        .archive-code-cell {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .archive-code-cell:hover {
+            color: var(--primary);
+        }
+
+        .archive-code-cell:hover::after {
+            content: '点击编辑';
+            position: absolute;
+            font-size: 0.8em;
+            color: var(--gray);
+            margin-left: 5px;
+            opacity: 0.7;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
+    <!-- 归档码编辑模态框 -->
+    <div id="archiveCodeModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 class="modal-title">编辑归档码</h3>
+            <form id="archiveCodeForm" method="post">
+                <input type="hidden" id="modal-notebook-id" name="id">
+                <input type="hidden" name="set_archive_code" value="1">
+                <div class="form-group">
+                    <label for="modal-archive-code" class="form-label">归档码：</label>
+                    <input type="text" id="modal-archive-code" name="archive_code" class="form-input" placeholder="请输入归档码">
+                </div>
+                <div class="btn-container">
+                    <button type="submit" class="btn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="background">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
@@ -667,7 +783,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                                             </label>
                                         </form>
                                     </td>
-                                    <td><?php echo htmlspecialchars($db->getArchiveCode($notebook['id'])) ?: '未设置'; ?></td>
+                                    <td class="archive-code-cell" onclick="editArchiveCode('<?php echo htmlspecialchars($notebook['id']); ?>', '<?php echo htmlspecialchars($db->getArchiveCode($notebook['id'])) ?>')"><?php echo htmlspecialchars($db->getArchiveCode($notebook['id'])) ?: '未设置'; ?></td>
                                     <td>
                                         <form method="post" action="admin.php<?php echo isset($_GET['page']) ? '?page=' . (int)$_GET['page'] : ''; ?>" style="display:inline;" onsubmit="return confirm('确定要删除记事本 <?php echo htmlspecialchars($notebook['id']); ?> 吗？\n此操作不可恢复！');">
                                             <input type="hidden" name="delete_id" value="<?php echo htmlspecialchars($notebook['id']); ?>">
@@ -738,6 +854,40 @@ $total_pages = ceil($total_notebooks / $per_page);
     </div>
 
     <script>
+        // 归档码编辑功能
+        const modal = document.getElementById('archiveCodeModal');
+        const closeBtn = document.querySelector('.modal-close');
+        const modalForm = document.getElementById('archiveCodeForm');
+        const modalNotebookId = document.getElementById('modal-notebook-id');
+        const modalArchiveCode = document.getElementById('modal-archive-code');
+
+        function editArchiveCode(notebookId, currentArchiveCode) {
+            modalNotebookId.value = notebookId;
+            modalArchiveCode.value = currentArchiveCode || '';
+            modal.style.display = 'block';
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        modalForm.onsubmit = function(e) {
+            const archiveCode = modalArchiveCode.value.trim();
+            if (archiveCode === '') {
+                if (!confirm('确定要清除归档码吗？')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // 添加渐入动画效果
         document.addEventListener('DOMContentLoaded', function() {
             const elements = document.querySelectorAll('.card, .admin-title, .header');
