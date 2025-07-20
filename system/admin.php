@@ -783,7 +783,7 @@ $total_pages = ceil($total_notebooks / $per_page);
                                             </label>
                                         </form>
                                     </td>
-                                    <td class="archive-code-cell" onclick="editArchiveCode('<?php echo htmlspecialchars($notebook['id']); ?>', '<?php echo htmlspecialchars($db->getArchiveCode($notebook['id'])) ?>')"><?php echo htmlspecialchars($db->getArchiveCode($notebook['id'])) ?: '未设置'; ?></td>
+                                    <td class="archive-code-cell" onclick="editArchiveCode('<?php echo htmlspecialchars($notebook['id']); ?>', '<?php echo htmlspecialchars((string)$db->getArchiveCode($notebook['id'])) ?>')"><?php echo htmlspecialchars((string)$db->getArchiveCode($notebook['id'])) ?: '未设置'; ?></td>
                                     <td>
                                         <form method="post" action="admin.php<?php echo isset($_GET['page']) ? '?page=' . (int)$_GET['page'] : ''; ?>" style="display:inline;" onsubmit="return confirm('确定要删除记事本 <?php echo htmlspecialchars($notebook['id']); ?> 吗？\n此操作不可恢复！');">
                                             <input type="hidden" name="delete_id" value="<?php echo htmlspecialchars($notebook['id']); ?>">
