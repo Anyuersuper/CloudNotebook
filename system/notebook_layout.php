@@ -694,13 +694,40 @@
                                 },
                                 body: 'action=update_public&id=' + noteId + '&ispublic=' + (isPublic ? '1' : '0')
                             }),
-                            // 保存归档码设置
+                            // 先检查归档码是否存在
                             fetch('./system/api.php', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded',
                                 },
-                                body: 'action=set_archive_code&id=' + noteId + '&archive_code=' + encodeURIComponent(archiveCode)
+                                body: 'action=check_archive_code&id=' + noteId + '&archive_code=' + encodeURIComponent(archiveCode)
+                            }).then(response => response.json())
+                            .then(data => {
+                                if (data.exists) {
+                                    return new Promise((resolve, reject) => {
+                                        if (confirm('该归档码已存在，确定要归档到该处吗？')) {
+                                            // 用户确认后再设置归档码
+                                            fetch('./system/api.php', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                                },
+                                                body: 'action=set_archive_code&id=' + noteId + '&archive_code=' + encodeURIComponent(archiveCode)
+                                            }).then(resolve).catch(reject);
+                                        } else {
+                                            reject(new Error('用户取消设置归档码'));
+                                        }
+                                    });
+                                } else {
+                                    // 归档码不存在，直接设置
+                                    return fetch('./system/api.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: 'action=set_archive_code&id=' + noteId + '&archive_code=' + encodeURIComponent(archiveCode)
+                                    });
+                                }
                             })
                         ])
                         .then(responses => Promise.all(responses.map(r => r.json())))

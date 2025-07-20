@@ -397,6 +397,27 @@ EOT;
     }
 
     /**
+     * 检查归档码是否已经存在
+     */
+    public function archiveCodeExists($archiveCode, $excludeId = null) {
+        try {
+            $sql = 'SELECT COUNT(*) FROM notebooks WHERE archive_code = :archive_code';
+            if ($excludeId) {
+                $sql .= ' AND id != :exclude_id';
+            }
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':archive_code', $archiveCode, PDO::PARAM_STR);
+            if ($excludeId) {
+                $stmt->bindParam(':exclude_id', $excludeId, PDO::PARAM_STR);
+            }
+            $stmt->execute();
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    /**
      * 统计指定归档码的笔记本数量
      */
     public function countNotebooksByArchiveCode($archiveCode) {
@@ -477,6 +498,9 @@ class NotebookAPI {
                     break;
                 case 'create_note':
                     $this->createNote($id);
+                    break;
+                case 'check_archive_code':
+                    $this->checkArchiveCode($id);
                     break;
                 case 'save_note':
                     $this->saveNote($id);
@@ -737,6 +761,34 @@ class NotebookAPI {
         }
     }
     
+    /**
+     * 检查归档码是否存在
+     */
+    private function checkArchiveCode($id) {
+        // 检查认证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '未授权的操作']);
+            exit;
+        }
+        
+        $archiveCode = isset($_POST['archive_code']) ? trim($_POST['archive_code']) : '';
+        
+        if (empty($archiveCode)) {
+            echo json_encode(['success' => false, 'message' => '归档码不能为空']);
+            exit;
+        }
+        
+        if (!$this->db->notebookExists($id)) {
+            echo json_encode(['success' => false, 'message' => '记事本不存在']);
+            exit;
+        }
+        
+        // 检查归档码是否已存在（排除当前笔记本）
+        $exists = $this->db->archiveCodeExists($archiveCode, $id);
+        
+        echo json_encode(['success' => true, 'exists' => $exists]);
+    }
+
     /**
      * 获取归档码
      */
