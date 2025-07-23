@@ -182,9 +182,10 @@
         /* 归档码输入框样式 */
         .settings-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 4px;   /* 减小标签的底部间距 */
             color: var(--light);
             font-weight: 500;
+            font-size: 0.9em;     /* 稍微减小标签文字大小 */
         }
 
         .settings-input {
@@ -229,11 +230,33 @@
             left: 0;
             background: rgba(28, 32, 51, 0.95);
             min-width: 200px;
+            max-height: 80vh; /* 设置最大高度为视口高度的80% */
             border-radius: 12px;
             padding: 15px;
             z-index: 1000;
             box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
             margin-top: 10px;
+            overflow-y: auto; /* 添加垂直滚动条 */
+            scrollbar-width: thin; /* Firefox 细滚动条 */
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* Firefox 滚动条颜色 */
+        }
+        
+        /* Webkit 浏览器的滚动条样式 */
+        .settings-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .settings-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .settings-content::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        
+        .settings-content::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
         .settings-content::before {
@@ -298,6 +321,18 @@
         .settings-item input[type="checkbox"]:checked::before {
             content: '✓';
             position: absolute;
+        }
+        
+        /* 删除按钮样式 */
+        .danger-btn {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: rgb(239, 68, 68) !important;
+        }
+        
+        .danger-btn:hover {
+            background: rgba(239, 68, 68, 0.9) !important;
+            color: white !important;
+        }
             color: white;
             font-size: 12px;
             top: 50%;
@@ -326,21 +361,22 @@
         }
 
         .settings-item {
-            margin-bottom: 10px;  /* 减小底部间距 */
-            padding: 5px 0;      /* 减小内边距 */
+            margin-bottom: 6px;   /* 进一步减小底部间距 */
+            padding: 3px 0;       /* 减小内边距 */
         }
 
         .settings-item:last-child {
-            margin-bottom: 10px;  /* 减小最后一项的底部间距 */
+            margin-bottom: 6px;   /* 减小最后一项的底部间距 */
         }
 
         .settings-description {
-            margin: 3px 0 8px 0;  /* 减小描述文字的上下间距 */
-            line-height: 1.3;     /* 减小描述文字的行高 */
+            margin: 2px 0 4px 0;  /* 减小描述文字的上下间距 */
+            line-height: 1.2;     /* 减小描述文字的行高 */
+            font-size: 0.8em;     /* 稍微减小描述文字的大小 */
         }
 
         .settings-divider {
-            margin: 8px 0;       /* 减小分隔线的上下间距 */
+            margin: 6px 0;        /* 减小分隔线的上下间距 */
         }
 
         /* 开关样式 */
@@ -497,6 +533,13 @@
                                         <i class="fas fa-link"></i> 复制公开链接
                                     </button>
                                     <div class="settings-description">复制可分享的公开访问链接</div>
+                                </div>
+                                <div class="settings-divider"></div>
+                                <div class="settings-item">
+                                    <button id="delete-notebook" class="btn mini-btn danger-btn">
+                                        <i class="fas fa-trash"></i> 删除笔记本
+                                    </button>
+                                    <div class="settings-description">永久删除此笔记本（此操作不可恢复）</div>
                                 </div>
                                 <div class="settings-divider"></div>
                                 <div class="settings-item">
@@ -667,6 +710,35 @@
                             console.error('Failed to copy:', err);
                             alert('复制链接失败，请手动复制');
                         });
+                    });
+                }
+
+                // 处理删除笔记本按钮
+                const deleteButton = document.getElementById('delete-notebook');
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', function() {
+                        if (confirm('确定要删除此笔记本吗？此操作不可恢复！')) {
+                            const formData = new FormData();
+                            formData.append('action', 'delete_notebook');
+                            formData.append('id', noteId);
+                            
+                            fetch('system/api.php', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.href = 'index.php';
+                                } else {
+                                    alert('删除失败：' + (data.message || '未知错误'));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('删除失败，请稍后重试');
+                            });
+                        }
                     });
                 }
 

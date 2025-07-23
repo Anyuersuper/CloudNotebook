@@ -481,8 +481,18 @@ class NotebookAPI {
         header('Content-Type: application/json');
         
         // 获取请求方法和操作类型
-        $action = isset($_POST['action']) ? $_POST['action'] : '';
-        $id = isset($_POST['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['id']) : '';
+        $input = file_get_contents('php://input');
+        $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+        
+        // 处理不同格式的请求数据
+        if (strpos($contentType, 'application/json') !== false) {
+            $data = json_decode($input, true) ?: [];
+            $action = isset($data['action']) ? $data['action'] : '';
+            $id = isset($data['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $data['id']) : '';
+        } else {
+            $action = isset($_POST['action']) ? $_POST['action'] : '';
+            $id = isset($_POST['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['id']) : '';
+        }
 
         // 验证ID
         if (empty($id)) {
@@ -522,6 +532,9 @@ class NotebookAPI {
                     break;
                 case 'get_notebooks_by_archive_code':
                     $this->getNotebooksByArchiveCode($id);
+                    break;
+                case 'delete_notebook':
+                    $this->deleteNotebook($id);
                     break;
                 default:
                     echo json_encode(['success' => false, 'message' => '无效的操作']);
@@ -581,6 +594,32 @@ class NotebookAPI {
     /**
      * 创建新记事本
      */
+    /**
+     * 删除记事本
+     */
+    private function deleteNotebook($id) {
+        // 检查是否已经通过身份验证
+        if (!isset($_SESSION['auth_' . $id]) || $_SESSION['auth_' . $id] !== true) {
+            echo json_encode(['success' => false, 'message' => '没有权限删除记事本']);
+            exit;
+        }
+
+        // 检查记事本是否存在
+        if (!$this->db->notebookExists($id)) {
+            echo json_encode(['success' => false, 'message' => '记事本不存在']);
+            exit;
+        }
+
+        // 尝试删除记事本
+        if ($this->db->deleteNotebook($id)) {
+            // 清除会话中的认证状态
+            unset($_SESSION['auth_' . $id]);
+            echo json_encode(['success' => true, 'message' => '记事本已成功删除']);
+        } else {
+            echo json_encode(['success' => false, 'message' => '删除记事本失败']);
+        }
+    }
+
     private function createNote($id) {
         $password = isset($_POST['password']) ? $_POST['password'] : '';
         $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
